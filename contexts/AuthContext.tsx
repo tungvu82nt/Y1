@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
-import { USER } from '../constants';
+import { api } from '../utils/api';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  login: (email: string) => void;
+  login: (email: string) => Promise<void>;
   logout: () => void;
   updateProfile: (data: Partial<User>) => void;
 }
@@ -17,41 +17,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Check local storage on load
+    // Check local storage on load for persistence session
     const storedUser = localStorage.getItem('yapee_user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
   }, []);
 
-  const login = (email: string) => {
-    // Simulate API call
-    // HARDCODED ADMIN FOR DEMO: admin@yapee.com
-    let mockUser: User;
-    
-    if (email === 'admin@yapee.com') {
-        mockUser = {
-            name: 'System Admin',
-            email: email,
-            avatar: 'https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff',
-            memberSince: '2020',
-            location: 'HQ',
-            isVip: true,
-            role: 'admin',
-            phone: '+1 (555) 000-0000'
-        };
-    } else {
-        mockUser = { 
-            ...USER, 
-            email: email,
-            name: email.split('@')[0] || USER.name,
-            role: 'customer',
-            phone: '+1 (555) 123-4567'
-        };
+  const login = async (email: string) => {
+    try {
+        const userData = await api.post('/auth/login', { email });
+        setUser(userData);
+        localStorage.setItem('yapee_user', JSON.stringify(userData));
+    } catch (error) {
+        console.error("Login failed", error);
+        alert("Login failed. Check server connection.");
     }
-    
-    setUser(mockUser);
-    localStorage.setItem('yapee_user', JSON.stringify(mockUser));
   };
 
   const logout = () => {
@@ -59,11 +40,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('yapee_user');
   };
 
-  const updateProfile = (data: Partial<User>) => {
+  const updateProfile = async (data: Partial<User>) => {
     if (!user) return;
-    const updatedUser = { ...user, ...data };
-    setUser(updatedUser);
-    localStorage.setItem('yapee_user', JSON.stringify(updatedUser));
+    try {
+        // Optimistic update
+        const updatedUser = { ...user, ...data };
+        setUser(updatedUser);
+        localStorage.setItem('yapee_user', JSON.stringify(updatedUser));
+        
+        // Sync with backend (assuming id exists on user object from DB)
+        // await api.put('/auth/profile', { id: (user as any).id, ...data });
+    } catch (e) {
+        console.error(e);
+    }
   };
 
   return (
