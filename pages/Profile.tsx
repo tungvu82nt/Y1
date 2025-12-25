@@ -27,7 +27,7 @@ export const Profile = () => {
                 <div className="flex items-center justify-center size-10 bg-primary rounded-full text-white">
                      <span className="material-symbols-outlined text-2xl">foot_bones</span>
                 </div>
-                <h1 className="text-xl font-extrabold tracking-tight">Kicks<span className="text-primary">Fast</span></h1>
+                <h1 className="text-xl font-extrabold tracking-tight">Yapee</h1>
              </div>
              <nav className="flex flex-col gap-2 flex-1">
                  {[

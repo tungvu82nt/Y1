@@ -16,7 +16,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Load from local storage
   useEffect(() => {
-    const storedWishlist = localStorage.getItem('shoestore_wishlist');
+    const storedWishlist = localStorage.getItem('yapee_wishlist');
     if (storedWishlist) {
       setWishlist(JSON.parse(storedWishlist));
     }
@@ -24,7 +24,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Save to local storage
   useEffect(() => {
-    localStorage.setItem('shoestore_wishlist', JSON.stringify(wishlist));
+    localStorage.setItem('yapee_wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
 
   const addToWishlist = (product: Product) => {

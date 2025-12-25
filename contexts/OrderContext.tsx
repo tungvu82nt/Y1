@@ -17,7 +17,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Load orders from local storage on mount
   useEffect(() => {
-    const storedOrders = localStorage.getItem('shoestore_orders');
+    const storedOrders = localStorage.getItem('yapee_orders');
     if (storedOrders) {
       setOrders(JSON.parse(storedOrders));
     }
@@ -25,7 +25,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Save orders to local storage whenever they change
   useEffect(() => {
-    localStorage.setItem('shoestore_orders', JSON.stringify(orders));
+    localStorage.setItem('yapee_orders', JSON.stringify(orders));
   }, [orders]);
 
   const addOrder = (items: CartItem[], subtotal: number, tax: number, total: number, address: string) => {

@@ -28,7 +28,7 @@ export const Login = () => {
                 <div className="flex size-8 items-center justify-center rounded-full bg-primary text-white">
                 <span className="material-symbols-outlined text-xl">sprint</span>
                 </div>
-                <span className="text-lg font-bold tracking-tight">ShoeSwift</span>
+                <span className="text-lg font-bold tracking-tight">Yapee</span>
             </Link>
             <h1 className="text-4xl font-black tracking-tight mb-2">Welcome Back</h1>
             <p className="text-gray-500 dark:text-gray-400">Please enter your details to sign in.</p>
@@ -73,7 +73,7 @@ export const Login = () => {
 
         <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-lg text-sm">
             <p className="font-bold">Demo Credentials:</p>
-            <p>Admin: <span className="font-mono">admin@shoeswift.com</span></p>
+            <p>Admin: <span className="font-mono">admin@yapee.com</span></p>
             <p>User: <span className="font-mono">alex@example.com</span></p>
         </div>
 

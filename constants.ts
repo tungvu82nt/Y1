@@ -1,3 +1,4 @@
+
 import { Product, User } from './types';
 
 export const USER: User = {
@@ -13,7 +14,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "1",
     name: "Velocity Runner 5000",
-    brand: "ShoeSwift",
+    brand: "Yapee",
     category: "Running",
     price: 125.00,
     originalPrice: 160.00,

@@ -1,10 +1,12 @@
 import React from 'react';
 import { useOrder } from '../../contexts/OrderContext';
 import { useProducts } from '../../contexts/ProductContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export const AdminDashboard = () => {
   const { orders } = useOrder();
   const { products } = useProducts();
+  const { t } = useLanguage();
 
   const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
   const pendingOrders = orders.filter(o => o.status === 'Processing').length;
@@ -14,10 +16,10 @@ export const AdminDashboard = () => {
     <div className="flex flex-col gap-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-                { label: 'Total Revenue', value: `$${totalRevenue.toFixed(2)}`, icon: 'attach_money', color: 'bg-green-500' },
-                { label: 'Total Orders', value: orders.length, icon: 'shopping_bag', color: 'bg-blue-500' },
-                { label: 'Products', value: products.length, icon: 'inventory_2', color: 'bg-purple-500' },
-                { label: 'Pending Orders', value: pendingOrders, icon: 'pending', color: 'bg-orange-500' }
+                { label: t('admin.total_revenue'), value: `$${totalRevenue.toFixed(2)}`, icon: 'attach_money', color: 'bg-green-500' },
+                { label: t('admin.total_orders'), value: orders.length, icon: 'shopping_bag', color: 'bg-blue-500' },
+                { label: t('admin.products'), value: products.length, icon: 'inventory_2', color: 'bg-purple-500' },
+                { label: t('admin.pending_orders'), value: pendingOrders, icon: 'pending', color: 'bg-orange-500' }
             ].map((stat, i) => (
                 <div key={i} className="bg-white dark:bg-[#1a1a1a] p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 flex items-center gap-4">
                     <div className={`size-12 rounded-full ${stat.color} bg-opacity-10 flex items-center justify-center text-${stat.color.replace('bg-', '')}`}>
@@ -33,14 +35,14 @@ export const AdminDashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
-                <h3 className="font-bold text-lg mb-4 text-slate-900 dark:text-white">Recent Orders</h3>
+                <h3 className="font-bold text-lg mb-4 text-slate-900 dark:text-white">{t('admin.recent_orders')}</h3>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                         <thead className="border-b border-gray-100 dark:border-gray-700">
                             <tr>
-                                <th className="pb-3 font-medium text-gray-500">Order ID</th>
-                                <th className="pb-3 font-medium text-gray-500">Total</th>
-                                <th className="pb-3 font-medium text-gray-500">Status</th>
+                                <th className="pb-3 font-medium text-gray-500">{t('admin.order_id')}</th>
+                                <th className="pb-3 font-medium text-gray-500">{t('common.total')}</th>
+                                <th className="pb-3 font-medium text-gray-500">{t('admin.stock_status')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -53,7 +55,7 @@ export const AdminDashboard = () => {
                                             order.status === 'Delivered' ? 'bg-green-100 text-green-700' : 
                                             order.status === 'Processing' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'
                                         }`}>
-                                            {order.status}
+                                            {t(`status.${order.status}`)}
                                         </span>
                                     </td>
                                 </tr>
@@ -64,7 +66,7 @@ export const AdminDashboard = () => {
             </div>
 
             <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
-                <h3 className="font-bold text-lg mb-4 text-slate-900 dark:text-white">Low Stock Alert</h3>
+                <h3 className="font-bold text-lg mb-4 text-slate-900 dark:text-white">{t('admin.low_stock_alert')}</h3>
                 {lowStock > 0 ? (
                     <div className="flex flex-col gap-3">
                         {products.filter(p => p.tags?.includes('limited')).slice(0, 5).map(p => (
@@ -72,16 +74,16 @@ export const AdminDashboard = () => {
                                 <img src={p.image} className="size-10 rounded bg-gray-100 object-cover" />
                                 <div className="flex-1">
                                     <p className="font-bold text-slate-900 dark:text-white line-clamp-1">{p.name}</p>
-                                    <p className="text-xs text-red-500 font-bold">Limited Stock</p>
+                                    <p className="text-xs text-red-500 font-bold">{t('common.stock_low')}</p>
                                 </div>
-                                <button className="text-xs font-bold text-primary border border-primary px-2 py-1 rounded">Restock</button>
+                                <button className="text-xs font-bold text-primary border border-primary px-2 py-1 rounded">{t('admin.restock')}</button>
                             </div>
                         ))}
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center h-40 text-gray-500">
                         <span className="material-symbols-outlined text-3xl mb-2">check_circle</span>
-                        <p>Inventory looks good</p>
+                        <p>{t('admin.inventory_good')}</p>
                     </div>
                 )}
             </div>

@@ -14,7 +14,7 @@ export const Register = () => {
                 <div className="flex size-8 items-center justify-center rounded-full bg-primary text-white">
                 <span className="material-symbols-outlined text-xl">sprint</span>
                 </div>
-                <span className="text-lg font-bold tracking-tight">ShoeSwift</span>
+                <span className="text-lg font-bold tracking-tight">Yapee</span>
             </Link>
             <h1 className="text-4xl font-black tracking-tight mb-2">Create Account</h1>
             <p className="text-gray-500 dark:text-gray-400">Join the club and get 15% off your first order.</p>

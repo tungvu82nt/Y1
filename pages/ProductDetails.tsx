@@ -72,7 +72,7 @@ export const ProductDetails = () => {
             <div className="px-6 lg:px-12 py-3 flex items-center justify-between">
                 <Link to="/" className="flex items-center gap-2 text-primary cursor-pointer">
                     <span className="material-symbols-outlined text-3xl">hiking</span>
-                    <h2 className="text-[#1b0d0e] dark:text-white text-xl font-extrabold tracking-tight">ShoeStore</h2>
+                    <h2 className="text-[#1b0d0e] dark:text-white text-xl font-extrabold tracking-tight">Yapee</h2>
                 </Link>
                 <Link to="/cart" className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
                     <span className="material-symbols-outlined">shopping_cart</span>

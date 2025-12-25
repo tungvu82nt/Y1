@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { translations, Language } from '../utils/translations';
 
@@ -14,7 +13,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [language, setLanguage] = useState<Language>('en');
 
   useEffect(() => {
-    const storedLang = localStorage.getItem('shoestore_lang') as Language;
+    const storedLang = localStorage.getItem('yapee_lang') as Language;
     if (storedLang && ['en', 'vi', 'zh'].includes(storedLang)) {
       setLanguage(storedLang);
     }
@@ -22,7 +21,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const handleSetLanguage = (lang: Language) => {
     setLanguage(lang);
-    localStorage.setItem('shoestore_lang', lang);
+    localStorage.setItem('yapee_lang', lang);
   };
 
   const t = (key: string): string => {

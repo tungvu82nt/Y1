@@ -17,7 +17,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Check local storage on load
-    const storedUser = localStorage.getItem('shoestore_user');
+    const storedUser = localStorage.getItem('yapee_user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -25,10 +25,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = (email: string) => {
     // Simulate API call
-    // HARDCODED ADMIN FOR DEMO: admin@shoeswift.com
+    // HARDCODED ADMIN FOR DEMO: admin@yapee.com
     let mockUser: User;
     
-    if (email === 'admin@shoeswift.com') {
+    if (email === 'admin@yapee.com') {
         mockUser = {
             name: 'System Admin',
             email: email,
@@ -48,12 +48,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     setUser(mockUser);
-    localStorage.setItem('shoestore_user', JSON.stringify(mockUser));
+    localStorage.setItem('yapee_user', JSON.stringify(mockUser));
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('shoestore_user');
+    localStorage.removeItem('yapee_user');
   };
 
   return (

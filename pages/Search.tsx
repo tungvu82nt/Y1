@@ -5,6 +5,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export const Search = () => {
   const [searchParams] = useSearchParams();
@@ -13,6 +14,7 @@ export const Search = () => {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
   const { showToast } = useToast();
+  const { t } = useLanguage();
   
   const query = searchParams.get('q');
   const category = searchParams.get('category');
@@ -35,14 +37,14 @@ export const Search = () => {
   const displayTitle = query 
     ? `Results for "${query}"` 
     : category 
-        ? `${category} Collection` 
-        : "All Sneakers";
+        ? t(`categories.${category}`) 
+        : t('categories.All');
 
   const handleQuickAdd = (e: React.MouseEvent, product: any) => {
       e.preventDefault(); // Prevent navigating to product details
       e.stopPropagation();
       addToCart(product, '9', 'Black');
-      showToast(`Added ${product.name} to cart`);
+      showToast(`${t('product.added_cart')}`);
   }
 
   const handleToggleWishlist = (e: React.MouseEvent, product: any, isLiked: boolean) => {
@@ -50,7 +52,7 @@ export const Search = () => {
     e.stopPropagation();
     toggleWishlist(product);
     if (!isLiked) {
-        showToast('Added to wishlist');
+        showToast(`${t('product.added_wishlist')}`);
     } else {
         showToast('Removed from wishlist', 'info');
     }
@@ -61,9 +63,9 @@ export const Search = () => {
        <div className="layout-container flex flex-col grow w-full max-w-[1440px] mx-auto px-4 md:px-6 lg:px-10 py-6">
             <div className="flex flex-col gap-2 mb-8">
                 <nav className="flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                    <Link className="hover:text-primary transition-colors" to="/">Home</Link>
+                    <Link className="hover:text-primary transition-colors" to="/">{t('nav.home')}</Link>
                     <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-                    <Link className="hover:text-primary transition-colors" to="/search">Sneakers</Link>
+                    <Link className="hover:text-primary transition-colors" to="/search">{t('nav.search')}</Link>
                     <span className="material-symbols-outlined text-[16px]">chevron_right</span>
                     <span className="text-slate-900 dark:text-white font-medium">{displayTitle}</span>
                 </nav>
@@ -73,12 +75,12 @@ export const Search = () => {
                         <p className="text-gray-500 dark:text-gray-400 mt-1">{filteredProducts.length} products found</p>
                     </div>
                     <button className="lg:hidden flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-white/10 rounded-full font-bold text-sm">
-                        <span className="material-symbols-outlined">tune</span> Filters
+                        <span className="material-symbols-outlined">tune</span> {t('common.filters')}
                     </button>
                     <div className="hidden lg:flex items-center gap-3">
-                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Sort by:</span>
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('common.sort_by')}:</span>
                         <button className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-full text-sm font-bold hover:border-primary transition-colors">
-                            Relevance <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                            {t('common.relevance')} <span className="material-symbols-outlined text-[18px]">expand_more</span>
                         </button>
                     </div>
                 </div>
@@ -90,18 +92,18 @@ export const Search = () => {
                     {category && (
                          <div className="flex flex-wrap gap-2">
                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
-                                 {category} <Link to="/search" className="hover:text-red-800"><span className="material-symbols-outlined text-[14px]">close</span></Link>
+                                 {t(`categories.${category}`)} <Link to="/search" className="hover:text-red-800"><span className="material-symbols-outlined text-[14px]">close</span></Link>
                              </span>
-                             <Link to="/search" className="text-xs text-gray-500 underline hover:text-primary ml-1">Clear all</Link>
+                             <Link to="/search" className="text-xs text-gray-500 underline hover:text-primary ml-1">{t('common.clear_all')}</Link>
                          </div>
                     )}
 
                     <div className="space-y-6">
                         <div className="border-t border-gray-100 dark:border-white/10 pt-6">
-                            <h3 className="font-bold mb-4 flex justify-between items-center cursor-pointer">Gender <span className="material-symbols-outlined">expand_less</span></h3>
+                            <h3 className="font-bold mb-4 flex justify-between items-center cursor-pointer">{t('common.gender')} <span className="material-symbols-outlined">expand_less</span></h3>
                             <div className="space-y-3">
                                 {[
-                                    {label: 'Men', checked: true}, {label: 'Women', checked: false}, {label: 'Unisex', checked: false}
+                                    {label: t('common.men'), checked: true}, {label: t('common.women'), checked: false}, {label: t('common.unisex'), checked: false}
                                 ].map((opt, i) => (
                                     <label key={i} className="flex items-center gap-3 cursor-pointer group">
                                         <div className={`relative flex items-center justify-center w-5 h-5 border-2 ${opt.checked ? 'border-primary bg-primary' : 'border-gray-300 dark:border-gray-600'} rounded group-hover:border-primary`}>
@@ -114,7 +116,7 @@ export const Search = () => {
                         </div>
 
                          <div className="border-t border-gray-100 dark:border-white/10 pt-6">
-                            <h3 className="font-bold mb-4 flex justify-between items-center cursor-pointer">Price <span className="material-symbols-outlined">expand_less</span></h3>
+                            <h3 className="font-bold mb-4 flex justify-between items-center cursor-pointer">{t('common.price_range')} <span className="material-symbols-outlined">expand_less</span></h3>
                              <div className="px-1 mb-4">
                                 <div className="h-1 w-full bg-gray-100 dark:bg-white/10 rounded-full relative">
                                     <div className="absolute left-0 top-0 h-full w-1/2 bg-primary rounded-full"></div>
@@ -136,7 +138,7 @@ export const Search = () => {
                 <section className="flex-1">
                     <div className="flex lg:hidden gap-2 pb-4 overflow-x-auto scrollbar-hide mb-4">
                         {['All', 'Jordan', 'Nike', 'Sale'].map((chip, i) => (
-                             <button key={i} className={`whitespace-nowrap flex h-8 items-center gap-x-2 rounded-full px-4 text-sm font-medium ${i === 0 ? 'bg-slate-900 text-white' : 'bg-white border border-gray-200 text-slate-900'}`}>{chip}</button>
+                             <button key={i} className={`whitespace-nowrap flex h-8 items-center gap-x-2 rounded-full px-4 text-sm font-medium ${i === 0 ? 'bg-slate-900 text-white' : 'bg-white border border-gray-200 text-slate-900'}`}>{t(`categories.${chip}`)}</button>
                         ))}
                     </div>
 
@@ -147,8 +149,8 @@ export const Search = () => {
                                 return (
                                 <Link key={i} to={`/product/${product.id}`} className="group relative flex flex-col bg-white dark:bg-white/5 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
                                     <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-white/5">
-                                        {product.tags && product.tags.includes('best-seller') && <span className="absolute top-3 left-3 z-10 bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">Best Seller</span>}
-                                        {product.tags && product.tags.includes('new') && <span className="absolute top-3 left-3 z-10 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">New</span>}
+                                        {product.tags && product.tags.includes('best-seller') && <span className="absolute top-3 left-3 z-10 bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">{t('tags.best-seller')}</span>}
+                                        {product.tags && product.tags.includes('new') && <span className="absolute top-3 left-3 z-10 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">{t('tags.new')}</span>}
                                         {product.discount && <span className="absolute top-3 left-3 z-10 bg-white text-primary border border-primary text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">{product.discount} OFF</span>}
                                         
                                         <button 
@@ -184,9 +186,9 @@ export const Search = () => {
                     ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-center">
                             <span className="material-symbols-outlined text-6xl text-gray-300 mb-4">search_off</span>
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No products found</h3>
-                            <p className="text-gray-500 mb-6">We couldn't find any products matching your search.</p>
-                            <Link to="/search" className="px-6 py-2 bg-primary text-white rounded-full font-bold text-sm">Clear Filters</Link>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t('common.no_results')}</h3>
+                            <p className="text-gray-500 mb-6">{t('common.no_results_desc')}</p>
+                            <Link to="/search" className="px-6 py-2 bg-primary text-white rounded-full font-bold text-sm">{t('common.clear_filters')}</Link>
                         </div>
                     )}
                 </section>

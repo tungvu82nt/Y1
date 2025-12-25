@@ -16,7 +16,7 @@ export const CompareProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Load from local storage
   useEffect(() => {
-    const stored = localStorage.getItem('shoestore_compare');
+    const stored = localStorage.getItem('yapee_compare');
     if (stored) {
       setCompareList(JSON.parse(stored));
     }
@@ -24,7 +24,7 @@ export const CompareProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Save to local storage
   useEffect(() => {
-    localStorage.setItem('shoestore_compare', JSON.stringify(compareList));
+    localStorage.setItem('yapee_compare', JSON.stringify(compareList));
   }, [compareList]);
 
   const addToCompare = (product: Product) => {

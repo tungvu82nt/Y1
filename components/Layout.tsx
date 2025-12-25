@@ -63,7 +63,7 @@ export const Layout: React.FC<{ children: React.ReactNode, noHeader?: boolean, n
               <div className="flex size-10 items-center justify-center rounded-full bg-primary text-white">
                 <span className="material-symbols-outlined text-2xl">sprint</span>
               </div>
-              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">ShoeSwift</span>
+              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Yapee</span>
             </Link>
 
             <div className="hidden max-w-md flex-1 px-8 md:flex">
@@ -136,7 +136,7 @@ export const Layout: React.FC<{ children: React.ReactNode, noHeader?: boolean, n
                 to={`/search?category=${encodeURIComponent(item)}`}
                 className={`whitespace-nowrap text-sm font-medium ${item === 'New Drops' ? 'text-primary font-semibold' : item === 'Sale' ? 'text-red-600 hover:text-red-700' : 'text-slate-600 hover:text-primary dark:text-slate-400'}`}
                >
-                 {item}
+                 {t(`categories.${item}`)}
                </Link>
              ))}
           </div>
@@ -162,7 +162,7 @@ export const Layout: React.FC<{ children: React.ReactNode, noHeader?: boolean, n
               </form>
             </div>
             <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-gray-100 pt-8 dark:border-gray-800 md:flex-row">
-              <p className="text-sm text-slate-400">© 2024 ShoeSwift Inc. {t('common.rights')}</p>
+              <p className="text-sm text-slate-400">© 2024 Yapee Inc. {t('common.rights')}</p>
               <div className="flex gap-6">
                 <Link to="#" className="text-sm text-slate-500 hover:text-primary">{t('common.privacy')}</Link>
                 <Link to="#" className="text-sm text-slate-500 hover:text-primary">{t('common.terms')}</Link>

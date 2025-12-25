@@ -50,7 +50,7 @@ export const Checkout = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <Link to="/" className="flex items-center gap-2">
                     <div className="size-8 text-primary"><span className="material-symbols-outlined !text-[32px]">sprint</span></div>
-                    <h2 className="text-[#1b0d0e] dark:text-white text-xl font-bold tracking-tight">ShoeStore</h2>
+                    <h2 className="text-[#1b0d0e] dark:text-white text-xl font-bold tracking-tight">Yapee</h2>
                 </Link>
                 <div className="flex items-center gap-6">
                     <span className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1 cursor-pointer"><span className="material-symbols-outlined !text-[18px]">help</span> Help</span>

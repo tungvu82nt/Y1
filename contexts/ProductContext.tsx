@@ -16,7 +16,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   useEffect(() => {
     // Load from local storage or use constants
-    const stored = localStorage.getItem('shoestore_products');
+    const stored = localStorage.getItem('yapee_products');
     if (stored) {
       setProducts(JSON.parse(stored));
     } else {
@@ -26,7 +26,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   useEffect(() => {
     if (products.length > 0) {
-        localStorage.setItem('shoestore_products', JSON.stringify(products));
+        localStorage.setItem('yapee_products', JSON.stringify(products));
     }
   }, [products]);
 
