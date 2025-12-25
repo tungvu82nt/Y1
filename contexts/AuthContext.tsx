@@ -8,6 +8,7 @@ interface AuthContextType {
   isAdmin: boolean;
   login: (email: string) => void;
   logout: () => void;
+  updateProfile: (data: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,14 +37,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             memberSince: '2020',
             location: 'HQ',
             isVip: true,
-            role: 'admin'
+            role: 'admin',
+            phone: '+1 (555) 000-0000'
         };
     } else {
         mockUser = { 
             ...USER, 
             email: email,
             name: email.split('@')[0] || USER.name,
-            role: 'customer'
+            role: 'customer',
+            phone: '+1 (555) 123-4567'
         };
     }
     
@@ -56,8 +59,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('yapee_user');
   };
 
+  const updateProfile = (data: Partial<User>) => {
+    if (!user) return;
+    const updatedUser = { ...user, ...data };
+    setUser(updatedUser);
+    localStorage.setItem('yapee_user', JSON.stringify(updatedUser));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isAdmin: user?.role === 'admin', login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isAdmin: user?.role === 'admin', login, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

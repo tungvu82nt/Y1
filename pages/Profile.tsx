@@ -1,14 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useOrder } from '../contexts/OrderContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useToast } from '../contexts/ToastContext';
 
 export const Profile = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, updateProfile } = useAuth();
   const { orders } = useOrder();
   const { t } = useLanguage();
+  const { showToast } = useToast();
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    location: ''
+  });
+
+  // Initialize form data when user data is available
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        location: user.location || ''
+      });
+    }
+  }, [user]);
 
   if (!isAuthenticated || !user) {
       return <Navigate to="/login" replace />;
@@ -17,6 +38,28 @@ export const Profile = () => {
   const handleLogout = () => {
       logout();
       navigate('/login');
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = () => {
+    updateProfile(formData);
+    showToast('Profile updated successfully', 'success');
+  };
+
+  const handleCancel = () => {
+    if (user) {
+        setFormData({
+            name: user.name || '',
+            email: user.email || '',
+            phone: user.phone || '',
+            location: user.location || ''
+        });
+        showToast('Changes discarded', 'info');
+    }
   };
 
   return (
@@ -94,23 +137,60 @@ export const Profile = () => {
              <div className="mb-10">
                  <div className="flex items-center justify-between mb-6">
                      <h2 className="text-xl font-bold">Personal Details</h2>
-                     <button className="text-primary text-sm font-bold hover:underline">{t('common.cancel')}</button>
+                     <button onClick={handleCancel} className="text-primary text-sm font-bold hover:underline">{t('common.cancel')}</button>
                  </div>
                  <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-gray-800/50">
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                         {[t('auth.full_name'), 'Last Name', t('auth.email'), t('checkout.phone')].map((label, i) => (
-                             <label key={i} className="flex flex-col gap-2">
-                                 <span className="text-sm font-bold">{label}</span>
-                                 <input 
-                                     className="w-full h-12 px-4 rounded-xl bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
-                                     type={label.includes('Email') ? 'email' : 'text'} 
-                                     defaultValue={i === 0 ? user.name.split(' ')[0] : i === 1 ? user.name.split(' ')[1] : i === 2 ? 'alex.doe@example.com' : '+1 (555) 123-4567'}
-                                 />
-                             </label>
-                         ))}
+                         {/* Name Input */}
+                         <label className="flex flex-col gap-2">
+                             <span className="text-sm font-bold">{t('auth.full_name')}</span>
+                             <input 
+                                 name="name"
+                                 className="w-full h-12 px-4 rounded-xl bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+                                 type="text"
+                                 value={formData.name}
+                                 onChange={handleInputChange}
+                             />
+                         </label>
+
+                         {/* Location Input (Replaces Last Name to match data model) */}
+                         <label className="flex flex-col gap-2">
+                             <span className="text-sm font-bold">{t('checkout.address')}</span>
+                             <input 
+                                 name="location"
+                                 className="w-full h-12 px-4 rounded-xl bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+                                 type="text"
+                                 value={formData.location}
+                                 onChange={handleInputChange}
+                             />
+                         </label>
+
+                         {/* Email Input */}
+                         <label className="flex flex-col gap-2">
+                             <span className="text-sm font-bold">{t('auth.email')}</span>
+                             <input 
+                                 name="email"
+                                 className="w-full h-12 px-4 rounded-xl bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+                                 type="email"
+                                 value={formData.email}
+                                 onChange={handleInputChange}
+                             />
+                         </label>
+
+                         {/* Phone Input */}
+                         <label className="flex flex-col gap-2">
+                             <span className="text-sm font-bold">{t('checkout.phone')}</span>
+                             <input 
+                                 name="phone"
+                                 className="w-full h-12 px-4 rounded-xl bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+                                 type="tel"
+                                 value={formData.phone}
+                                 onChange={handleInputChange}
+                             />
+                         </label>
                      </div>
                      <div className="mt-8 flex justify-end">
-                         <button className="bg-slate-900 dark:bg-white text-white dark:text-background-dark font-bold py-3 px-8 rounded-full hover:opacity-90 transition-opacity">{t('common.save')}</button>
+                         <button onClick={handleSave} className="bg-slate-900 dark:bg-white text-white dark:text-background-dark font-bold py-3 px-8 rounded-full hover:opacity-90 transition-opacity">{t('common.save')}</button>
                      </div>
                  </div>
              </div>

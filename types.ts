@@ -27,6 +27,7 @@ export interface User {
   location: string;
   isVip: boolean;
   role: 'admin' | 'customer';
+  phone?: string;
 }
 
 export interface Order {
