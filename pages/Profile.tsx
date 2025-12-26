@@ -145,47 +145,52 @@ export const Profile = () => {
                          <label className="flex flex-col gap-2">
                              <span className="text-sm font-bold">{t('auth.full_name')}</span>
                              <input 
+                                 id="profile-name"
                                  name="name"
                                  className="w-full h-12 px-4 rounded-xl bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
                                  type="text"
                                  value={formData.name}
                                  onChange={handleInputChange}
+                                 autoComplete="name"
                              />
                          </label>
 
-                         {/* Location Input (Replaces Last Name to match data model) */}
                          <label className="flex flex-col gap-2">
                              <span className="text-sm font-bold">{t('checkout.address')}</span>
                              <input 
+                                 id="profile-location"
                                  name="location"
                                  className="w-full h-12 px-4 rounded-xl bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
                                  type="text"
                                  value={formData.location}
                                  onChange={handleInputChange}
+                                 autoComplete="street-address"
                              />
                          </label>
 
-                         {/* Email Input */}
                          <label className="flex flex-col gap-2">
                              <span className="text-sm font-bold">{t('auth.email')}</span>
                              <input 
+                                 id="profile-email"
                                  name="email"
                                  className="w-full h-12 px-4 rounded-xl bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
                                  type="email"
                                  value={formData.email}
                                  onChange={handleInputChange}
+                                 autoComplete="email"
                              />
                          </label>
 
-                         {/* Phone Input */}
                          <label className="flex flex-col gap-2">
                              <span className="text-sm font-bold">{t('checkout.phone')}</span>
                              <input 
+                                 id="profile-phone"
                                  name="phone"
                                  className="w-full h-12 px-4 rounded-xl bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
                                  type="tel"
                                  value={formData.phone}
                                  onChange={handleInputChange}
+                                 autoComplete="tel"
                              />
                          </label>
                      </div>

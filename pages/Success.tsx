@@ -4,12 +4,14 @@ import { Layout } from '../components/Layout';
 import { useOrder } from '../contexts/OrderContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 export const Success = () => {
     const navigate = useNavigate();
     const { currentOrder } = useOrder();
     const { user } = useAuth();
     const { t } = useLanguage();
+    const { formatPrice } = useCurrency();
 
     // If no order exists in session, redirect to home (prevent direct access)
     useEffect(() => {
@@ -56,7 +58,7 @@ export const Success = () => {
                                             <h3 className="text-xl font-bold text-slate-900 dark:text-white">{mainItem.name}</h3>
                                             <p className="text-gray-500 text-sm">{mainItem.brand}</p>
                                         </div>
-                                        <span className="text-lg font-bold text-primary">${currentOrder.total.toFixed(2)}</span>
+                                        <span className="text-lg font-bold text-primary">{formatPrice(currentOrder.total)}</span>
                                     </div>
                                 </div>
                                 <div className="flex gap-3">

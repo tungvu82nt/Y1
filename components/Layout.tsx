@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 export const Layout: React.FC<{ children: React.ReactNode, noHeader?: boolean, noFooter?: boolean }> = ({ children, noHeader, noFooter }) => {
   const location = useLocation();
@@ -14,6 +15,7 @@ export const Layout: React.FC<{ children: React.ReactNode, noHeader?: boolean, n
   const { totalItems } = useCart();
   const { toasts, removeToast } = useToast();
   const { t, language, setLanguage } = useLanguage();
+  const { currentCurrency, currencies, setCurrentCurrency } = useCurrency();
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -100,6 +102,8 @@ export const Layout: React.FC<{ children: React.ReactNode, noHeader?: boolean, n
                       </div>
                   </div>
               </div>
+
+
 
               <Link to="/search" className="flex size-10 items-center justify-center rounded-full text-slate-700 transition-colors hover:bg-surface-light dark:text-slate-200 dark:hover:bg-surface-dark md:hidden">
                 <span className="material-symbols-outlined">search</span>

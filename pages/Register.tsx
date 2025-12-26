@@ -46,7 +46,7 @@ export const Register = () => {
             </div>
 
             <div className="flex items-start gap-2 mt-2">
-                <input type="checkbox" className="mt-1 w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" id="terms" />
+                <input type="checkbox" className="mt-1 w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" id="terms" name="terms" />
                 <label htmlFor="terms" className="text-sm text-gray-500 dark:text-gray-400">
                     I agree to the <Link to="#" className="text-primary hover:underline">Terms of Service</Link> and <Link to="#" className="text-primary hover:underline">Privacy Policy</Link>
                 </label>

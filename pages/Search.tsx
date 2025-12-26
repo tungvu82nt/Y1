@@ -2,18 +2,13 @@ import React from 'react';
 import { Layout } from '../components/Layout';
 import { useProducts } from '../contexts/ProductContext';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { useWishlist } from '../contexts/WishlistContext';
-import { useCart } from '../contexts/CartContext';
-import { useToast } from '../contexts/ToastContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { ProductCard } from '../components/ProductCard';
 
 export const Search = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { products } = useProducts(); // Use Context
-  const { toggleWishlist, isInWishlist } = useWishlist();
-  const { addToCart } = useCart();
-  const { showToast } = useToast();
   const { t } = useLanguage();
   
   const query = searchParams.get('q');
@@ -39,24 +34,6 @@ export const Search = () => {
     : category 
         ? t(`categories.${category}`) 
         : t('categories.All');
-
-  const handleQuickAdd = (e: React.MouseEvent, product: any) => {
-      e.preventDefault(); // Prevent navigating to product details
-      e.stopPropagation();
-      addToCart(product, '9', 'Black');
-      showToast(`${t('product.added_cart')}`);
-  }
-
-  const handleToggleWishlist = (e: React.MouseEvent, product: any, isLiked: boolean) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleWishlist(product);
-    if (!isLiked) {
-        showToast(`${t('product.added_wishlist')}`);
-    } else {
-        showToast('Removed from wishlist', 'info');
-    }
-  }
 
   return (
     <Layout>
@@ -124,12 +101,14 @@ export const Search = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
-                                {['0', '500'].map((val, i) => (
-                                    <div key={i} className="relative flex-1">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
-                                        <input className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-lg py-2 pl-6 pr-2 text-sm font-bold focus:ring-1 ring-primary" type="number" defaultValue={val}/>
-                                    </div>
-                                ))}
+                                <div className="relative flex-1">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
+                                    <input id="price-min" name="price-min" className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-lg py-2 pl-6 pr-2 text-sm font-bold focus:ring-1 ring-primary" type="number" defaultValue="0" />
+                                </div>
+                                <div className="relative flex-1">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
+                                    <input id="price-max" name="price-max" className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-lg py-2 pl-6 pr-2 text-sm font-bold focus:ring-1 ring-primary" type="number" defaultValue="500" />
+                                </div>
                             </div>
                          </div>
                     </div>
@@ -144,44 +123,9 @@ export const Search = () => {
 
                     {filteredProducts.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                            {filteredProducts.map((product, i) => {
-                                const isLiked = isInWishlist(product.id);
-                                return (
-                                <Link key={i} to={`/product/${product.id}`} className="group relative flex flex-col bg-white dark:bg-white/5 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                                    <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-white/5">
-                                        {product.tags && product.tags.includes('best-seller') && <span className="absolute top-3 left-3 z-10 bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">{t('tags.best-seller')}</span>}
-                                        {product.tags && product.tags.includes('new') && <span className="absolute top-3 left-3 z-10 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">{t('tags.new')}</span>}
-                                        {product.discount && <span className="absolute top-3 left-3 z-10 bg-white text-primary border border-primary text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">{product.discount} OFF</span>}
-                                        
-                                        <button 
-                                            onClick={(e) => handleToggleWishlist(e, product, isLiked)}
-                                            className={`absolute top-3 right-3 z-10 p-2 rounded-full backdrop-blur-sm transition-colors ${isLiked ? 'bg-white text-primary' : 'bg-white/50 text-slate-900 hover:bg-white'}`}
-                                        >
-                                            <span className={`material-symbols-outlined text-[20px] ${isLiked ? 'icon-fill' : ''}`}>favorite</span>
-                                        </button>
-                                        <img className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105" src={product.image} />
-                                    </div>
-                                    <div className="p-4 flex flex-col flex-1">
-                                        <div className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">{product.brand}</div>
-                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight mb-2">{product.name}</h3>
-                                        <div className="mt-auto flex items-center justify-between">
-                                            <div className="flex flex-col">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-lg font-bold text-slate-900 dark:text-white">${product.price.toFixed(2)}</span>
-                                                    {product.originalPrice && <span className="text-sm text-gray-400 line-through">${product.originalPrice.toFixed(2)}</span>}
-                                                </div>
-                                            </div>
-                                            <button 
-                                                onClick={(e) => handleQuickAdd(e, product)}
-                                                className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary dark:hover:bg-primary dark:hover:text-white transition-colors shadow-lg"
-                                            >
-                                                <span className="material-symbols-outlined text-[20px]">add</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </Link>
-                                )
-                            })}
+                            {filteredProducts.map((product, i) => (
+                                <ProductCard key={i} product={product} variant="grid" />
+                            ))}
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-center">

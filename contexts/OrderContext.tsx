@@ -21,8 +21,9 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     const fetchOrders = async () => {
         try {
-            const data = await api.get('/orders');
-            setOrders(data);
+            const response = await api.get('/orders');
+            const orders = response.data || response;
+            setOrders(orders);
         } catch (e) {
             console.error("Using local orders due to API error");
             const storedOrders = localStorage.getItem('yapee_orders');
@@ -45,28 +46,48 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
         const newOrder = await api.post('/orders', orderPayload);
         
-        // Transform the backend response to match frontend Order type if structure differs slightly
-        // Here we assume backend returns a structure compatible with Order interface after format
         const formattedOrder: Order = {
             ...newOrder,
             date: new Date(newOrder.date).toLocaleDateString(),
-            items: items // Keep items as is for immediate UI feedback
+            items: items
         };
 
         setOrders(prev => [formattedOrder, ...prev]);
         setCurrentOrder(formattedOrder);
         
-        // Backup to local storage
         localStorage.setItem('yapee_orders', JSON.stringify([formattedOrder, ...orders]));
     } catch (e) {
-        console.error("Failed to submit order", e);
-        alert("Failed to submit order to server.");
+        console.error("API not available, using local storage", e);
+        
+        const localOrder: Order = {
+            id: Date.now().toString(),
+            userId: (user as any)?.id || null,
+            items,
+            subtotal,
+            tax,
+            total,
+            shippingAddress: address,
+            status: 'pending',
+            date: new Date().toLocaleDateString()
+        };
+
+        setOrders(prev => [localOrder, ...prev]);
+        setCurrentOrder(localOrder);
+        
+        localStorage.setItem('yapee_orders', JSON.stringify([localOrder, ...orders]));
     }
   };
 
-  const updateOrderStatus = (id: string, status: Order['status']) => {
-      setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
-      // In real app: await api.put(`/orders/${id}`, { status });
+  const updateOrderStatus = async (id: string, status: Order['status']) => {
+      try {
+          const updated = await api.put(`/orders/${id}/status`, { status });
+          setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+          localStorage.setItem('yapee_orders', JSON.stringify(orders.map(o => o.id === id ? { ...o, status } : o)));
+      } catch (e) {
+          console.error("API not available, updating local storage", e);
+          setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+          localStorage.setItem('yapee_orders', JSON.stringify(orders.map(o => o.id === id ? { ...o, status } : o)));
+      }
   };
 
   const getOrderById = (id: string) => {

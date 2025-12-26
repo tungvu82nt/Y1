@@ -5,6 +5,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useOrder } from '../contexts/OrderContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 export const Checkout = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export const Checkout = () => {
   const { user } = useAuth();
   const { addOrder } = useOrder();
   const { t } = useLanguage();
+  const { formatPrice } = useCurrency();
 
   const [shippingAddress, setShippingAddress] = useState(user?.location || '');
   const [phone, setPhone] = useState('');
@@ -85,34 +87,40 @@ export const Checkout = () => {
 
                     <form className="flex flex-col gap-8" onSubmit={handlePayment}>
                         <div className="group/field">
-                            <label className="block text-base font-bold mb-3">{t('checkout.phone')}</label>
+                            <label className="block text-base font-bold mb-3" htmlFor="checkout-phone">{t('checkout.phone')}</label>
                             <div className="flex w-full items-center rounded-full border border-gray-200 dark:border-gray-700 bg-surface-light dark:bg-surface-dark focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all overflow-hidden h-14">
                                 <div className="pl-5 pr-3 text-gray-500 flex items-center justify-center border-r border-gray-200 dark:border-gray-700 h-full">
                                     <span className="material-symbols-outlined">call</span>
                                 </div>
                                 <input 
+                                    id="checkout-phone"
+                                    name="phone"
                                     className="w-full h-full bg-transparent border-none focus:ring-0 px-4 text-base placeholder:text-gray-400 dark:placeholder:text-gray-600 text-slate-900 dark:text-white" 
                                     placeholder="+1 (555) 000-0000" 
                                     type="tel" 
                                     required 
+                                    autoComplete="tel"
                                     value={phone}
                                     onChange={(e) => setPhone(e.target.value)}
                                 />
                             </div>
                         </div>
                         <div className="group/field relative">
-                            <label className="block text-base font-bold mb-3">{t('checkout.shipping_address')}</label>
+                            <label className="block text-base font-bold mb-3" htmlFor="checkout-address">{t('checkout.shipping_address')}</label>
                             <div className="flex w-full items-center rounded-full border border-gray-200 dark:border-gray-700 bg-surface-light dark:bg-surface-dark focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all overflow-hidden h-14 relative z-10">
                                 <div className="pl-5 pr-3 text-gray-500 flex items-center justify-center h-full">
                                     <span className="material-symbols-outlined">search</span>
                                 </div>
                                 <input 
+                                    id="checkout-address"
+                                    name="shipping-address"
                                     className="w-full h-full bg-transparent border-none focus:ring-0 px-2 text-base placeholder:text-gray-400 dark:placeholder:text-gray-600 text-slate-900 dark:text-white" 
                                     placeholder="Start typing address..." 
                                     type="text" 
+                                    required
+                                    autoComplete="street-address"
                                     value={shippingAddress}
                                     onChange={(e) => setShippingAddress(e.target.value)}
-                                    required
                                 />
                             </div>
                         </div>
@@ -143,7 +151,7 @@ export const Checkout = () => {
                         </div>
 
                         <button type="submit" className="mt-4 w-full h-14 bg-primary hover:bg-primary-hover text-white text-lg font-bold rounded-full shadow-lg shadow-primary/30 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 group">
-                            {t('checkout.pay_now')} ${total.toFixed(2)}
+                            {t('checkout.pay_now')} {formatPrice(total)}
                             <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
                         </button>
                     </form>
@@ -169,7 +177,7 @@ export const Checkout = () => {
                                     <div className="flex flex-col justify-center gap-1">
                                         <h3 className="font-bold text-base leading-tight line-clamp-1">{item.name}</h3>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">{t('common.size')}: {item.selectedSize} · {item.selectedColor}</p>
-                                        <div className="text-sm font-semibold mt-1">${(item.price * item.quantity).toFixed(2)}</div>
+                                        <div className="text-sm font-semibold mt-1">{formatPrice(item.price * item.quantity)}</div>
                                     </div>
                                 </div>
                             ))}
@@ -179,25 +187,25 @@ export const Checkout = () => {
                          <div className="flex flex-col gap-3 mb-6">
                             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                                 <span>{t('common.subtotal')}</span>
-                                <span className="font-medium text-[#1b0d0e] dark:text-white">${subtotal.toFixed(2)}</span>
+                                <span className="font-medium text-[#1b0d0e] dark:text-white">{formatPrice(subtotal)}</span>
                             </div>
                             <div className="flex justify-between text-sm items-center">
                                 <span className="text-gray-600 dark:text-gray-400">{t('common.shipping')}</span>
                                 <div className="flex items-center gap-2">
-                                    <span className="line-through text-gray-400 text-xs">$12.00</span>
+                                    <span className="line-through text-gray-400 text-xs">{formatPrice(12)}</span>
                                     <span className="font-bold text-xs bg-promotion text-black px-2 py-0.5 rounded-full uppercase tracking-wider">{t('common.free')}</span>
                                 </div>
                             </div>
                             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                                 <span>{t('common.tax')} (8%)</span>
-                                <span className="font-medium text-[#1b0d0e] dark:text-white">${tax.toFixed(2)}</span>
+                                <span className="font-medium text-[#1b0d0e] dark:text-white">{formatPrice(tax)}</span>
                             </div>
                         </div>
                         <div className="h-px w-full bg-gray-200 dark:bg-gray-700 mb-6"></div>
                          <div className="flex justify-between items-end mb-8">
                             <div>
                                 <span className="block text-sm text-gray-500 mb-1">{t('common.total')}</span>
-                                <div className="text-3xl font-black tracking-tight text-[#1b0d0e] dark:text-white">${total.toFixed(2)}</div>
+                                <div className="text-3xl font-black tracking-tight text-[#1b0d0e] dark:text-white">{formatPrice(total)}</div>
                             </div>
                             <div className="text-right">
                                 <span className="text-xs text-gray-400">USD</span>

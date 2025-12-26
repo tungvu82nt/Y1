@@ -8,6 +8,7 @@ import { CompareProvider } from './contexts/CompareContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { ProductProvider } from './contexts/ProductContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { CurrencyProvider } from './contexts/CurrencyContext';
 import { Home } from './pages/Home';
 import { ProductDetails } from './pages/ProductDetails';
 import { Cart } from './pages/Cart';
@@ -25,6 +26,7 @@ import { AdminLayout } from './pages/admin/AdminLayout';
 import { AdminDashboard } from './pages/admin/Dashboard';
 import { AdminProducts } from './pages/admin/AdminProducts';
 import { AdminOrders } from './pages/admin/AdminOrders';
+import { AdminCurrencies } from './pages/admin/AdminCurrencies';
 
 const ScrollToTop = () => {
     const { pathname } = useLocation();
@@ -35,7 +37,8 @@ const ScrollToTop = () => {
 }
 
 const ProtectedAdminRoute = ({ children }: { children?: React.ReactNode }) => {
-    const { user, isAdmin } = useAuth();
+    const { user, isAdmin, isLoading } = useAuth();
+    if (isLoading) return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
     if (!user) return <Navigate to="/login" replace />;
     if (!isAdmin) return <Navigate to="/" replace />; // Redirect non-admins
     return <>{children}</>;
@@ -44,53 +47,57 @@ const ProtectedAdminRoute = ({ children }: { children?: React.ReactNode }) => {
 const App = () => {
   return (
     <LanguageProvider>
-      <AuthProvider>
-        <ProductProvider>
-          <CartProvider>
-              <OrderProvider>
-              <WishlistProvider>
-                  <CompareProvider>
-                  <ToastProvider>
-                      <HashRouter>
-                      <ScrollToTop />
-                      <Routes>
-                          {/* Public Routes */}
-                          <Route path="/" element={<Home />} />
-                          <Route path="/product/:id" element={<ProductDetails />} />
-                          <Route path="/cart" element={<Cart />} />
-                          <Route path="/checkout" element={<Checkout />} />
-                          <Route path="/success" element={<Success />} />
-                          <Route path="/track" element={<TrackOrder />} />
-                          <Route path="/profile" element={<Profile />} />
-                          <Route path="/search" element={<Search />} />
-                          <Route path="/categories" element={<Search />} />
-                          <Route path="/wishlist" element={<Wishlist />} />
-                          <Route path="/compare" element={<Compare />} />
-                          <Route path="/login" element={<Login />} />
-                          <Route path="/register" element={<Register />} />
+      <CurrencyProvider>
+        <AuthProvider>
+          <ProductProvider>
+            <CartProvider>
+                <OrderProvider>
+                <WishlistProvider>
+                    <CompareProvider>
+                    <ToastProvider>
+                        <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                        <ScrollToTop />
+                        <Routes>
+                            {/* Public Routes */}
+                            <Route path="/" element={<Home />} />
+                            <Route path="/product/:id" element={<ProductDetails />} />
+                            <Route path="/cart" element={<Cart />} />
+                            <Route path="/checkout" element={<Checkout />} />
+                            <Route path="/success" element={<Success />} />
+                            <Route path="/track-order" element={<TrackOrder />} />
+                            <Route path="/profile" element={<Profile />} />
+                            <Route path="/search" element={<Search />} />
+                            <Route path="/categories" element={<Search />} />
+                            <Route path="/wishlist" element={<Wishlist />} />
+                            <Route path="/compare" element={<Compare />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/register" element={<Register />} />
 
-                          {/* Admin Routes */}
-                          <Route path="/admin" element={
-                              <ProtectedAdminRoute>
-                                  <AdminLayout />
-                              </ProtectedAdminRoute>
-                          }>
-                              <Route index element={<AdminDashboard />} />
-                              <Route path="products" element={<AdminProducts />} />
-                              <Route path="orders" element={<AdminOrders />} />
-                          </Route>
-                          
-                          {/* Error Route */}
-                          <Route path="*" element={<NotFound />} />
-                      </Routes>
-                      </HashRouter>
-                  </ToastProvider>
-                  </CompareProvider>
-              </WishlistProvider>
-              </OrderProvider>
-          </CartProvider>
-        </ProductProvider>
-      </AuthProvider>
+                            {/* Admin Routes */}
+                            <Route path="/admin" element={
+                                <ProtectedAdminRoute>
+                                    <AdminLayout />
+                                </ProtectedAdminRoute>
+                            }>
+                                <Route index element={<AdminDashboard />} />
+                                <Route path="dashboard" element={<AdminDashboard />} />
+                                <Route path="products" element={<AdminProducts />} />
+                                <Route path="orders" element={<AdminOrders />} />
+                                <Route path="currencies" element={<AdminCurrencies />} />
+                            </Route>
+                            
+                            {/* Error Route */}
+                            <Route path="*" element={<NotFound />} />
+                        </Routes>
+                        </HashRouter>
+                    </ToastProvider>
+                    </CompareProvider>
+                </WishlistProvider>
+                </OrderProvider>
+            </CartProvider>
+          </ProductProvider>
+        </AuthProvider>
+      </CurrencyProvider>
     </LanguageProvider>
   );
 };

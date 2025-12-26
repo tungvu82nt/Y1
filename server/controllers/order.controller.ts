@@ -1,64 +1,96 @@
-
 import { Request, Response } from 'express';
-import { prisma } from '../db.js';
+import { orderService } from '../services/order.service.ts';
+import { ApiError } from '../middleware/error.middleware.ts';
 
-export const getOrders = async (req: Request, res: Response) => {
-    try {
-        const orders = await prisma.order.findMany({
-            include: {
-                items: {
-                    include: { product: true }
-                }
-            },
-            orderBy: { date: 'desc' }
-        });
-        
-        // Format for frontend
-        const formattedOrders = orders.map(order => ({
-            ...order,
-            date: order.date.toLocaleDateString(), // Convert Date object to string
-            items: order.items.map(item => ({
-                ...item.product,
-                quantity: item.quantity,
-                selectedSize: item.selectedSize,
-                selectedColor: item.selectedColor
-            }))
-        }));
-        res.json(formattedOrders);
-    } catch (error: any) {
-        console.error('Error fetching orders:', error);
-        res.status(500).json({ message: "Failed to fetch orders", error: error.message });
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    role: string;
+  };
+}
+
+export const getOrders = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    const orders = await orderService.getOrders(userId);
+    res.json(orders);
+  } catch (error: unknown) {
+    if (error instanceof ApiError) {
+      res.status(error.statusCode).json({
+        success: false,
+        error: {
+          code: error.code,
+          message: error.message,
+        },
+      });
+      return;
     }
+    console.error('Error fetching orders:', error);
+    throw ApiError.internal('Failed to fetch orders');
+  }
 };
 
-export const createOrder = async (req: Request, res: Response) => {
-  const { userId, items, subtotal, tax, total, shippingAddress } = req.body;
-  
+export const createOrder = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  const userId = req.user?.id;
+
+  if (!userId) {
+    throw ApiError.unauthorized('NOT_AUTHENTICATED', 'User not authenticated');
+  }
+
   try {
-    const order = await prisma.order.create({
-      data: {
-        userId, 
-        subtotal,
-        tax,
-        total,
-        shippingAddress,
-        paymentMethod: 'VISA ending in 4242',
-        // Simulate 3 day delivery
-        estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toDateString(),
-        items: {
-          create: items.map((item: any) => ({
-            productId: item.id,
-            quantity: item.quantity,
-            selectedSize: item.selectedSize,
-            selectedColor: item.selectedColor,
-            priceAtTime: item.price
-          }))
-        }
-      }
+    const validatedInput = orderService.validateOrderInput(req.body);
+    const order = await orderService.createOrder({
+      userId,
+      ...validatedInput,
     });
-    res.status(201).json(order);
-  } catch (error: any) {
+
+    res.status(201).json({
+      success: true,
+      data: order,
+    });
+  } catch (error: unknown) {
+    if (error instanceof ApiError) {
+      res.status(error.statusCode).json({
+        success: false,
+        error: {
+          code: error.code,
+          message: error.message,
+        },
+      });
+      return;
+    }
     console.error('Error creating order:', error);
-    res.status(500).json({ message: 'Order creation failed', error: error.message });
+    throw ApiError.internal('Order creation failed');
+  }
+};
+
+export const updateOrderStatus = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const order = await orderService.updateOrderStatus(id, status);
+
+    if (!order) {
+      throw ApiError.notFound('ORDER_NOT_FOUND', 'Order not found');
+    }
+
+    res.json({
+      success: true,
+      data: order,
+    });
+  } catch (error: unknown) {
+    if (error instanceof ApiError) {
+      res.status(error.statusCode).json({
+        success: false,
+        error: {
+          code: error.code,
+          message: error.message,
+        },
+      });
+      return;
+    }
+    console.error('Error updating order status:', error);
+    throw ApiError.internal('Failed to update order status');
   }
 };

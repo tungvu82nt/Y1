@@ -3,11 +3,13 @@ import { Layout } from '../components/Layout';
 import { Link, useNavigate } from 'react-router-dom';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useCart } from '../contexts/CartContext';
-import { PRODUCTS } from '../constants';
+import { useProducts } from '../contexts/ProductContext';
+import { ProductCard } from '../components/ProductCard';
 
 export const Wishlist = () => {
   const { wishlist, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
+  const { products } = useProducts();
   const navigate = useNavigate();
 
   const handleAddToCart = (product: any) => {
@@ -19,6 +21,11 @@ export const Wishlist = () => {
       wishlist.forEach(p => addToCart(p, '9', 'Black'));
       navigate('/cart');
   };
+
+  // Get some recommendations (excluding items already in wishlist)
+  const recommendations = products
+    .filter(p => !wishlist.find(w => w.id === p.id))
+    .slice(0, 4);
 
   return (
     <Layout>
@@ -85,14 +92,8 @@ export const Wishlist = () => {
            <div className="mt-16 border-t border-gray-100 dark:border-gray-800 pt-10">
                 <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">You might also like</h2>
                 <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
-                    {PRODUCTS.slice(3, 6).map((product, i) => (
-                        <Link to={`/product/${product.id}`} key={i} className="min-w-[200px] md:min-w-[240px] flex flex-col gap-2 group cursor-pointer">
-                            <div className="w-full aspect-square rounded-xl bg-gray-100 dark:bg-gray-800 bg-cover bg-center group-hover:scale-105 transition-transform duration-300" style={{backgroundImage: `url('${product.image}')`}}></div>
-                            <div>
-                                <p className="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">{product.name}</p>
-                                <p className="text-sm text-gray-500">${product.price.toFixed(2)}</p>
-                            </div>
-                        </Link>
+                    {recommendations.map((product, i) => (
+                        <ProductCard key={i} product={product} variant="compact" />
                     ))}
                 </div>
             </div>

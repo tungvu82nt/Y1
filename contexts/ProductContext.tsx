@@ -20,8 +20,9 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     const fetchProducts = async () => {
         try {
-            const data = await api.get('/products');
-            setProducts(data);
+            const response = await api.get('/products');
+            const products = response.data || response;
+            setProducts(products);
         } catch (error) {
             console.error("Failed to load products from server, using fallback", error);
             setProducts(FALLBACK_PRODUCTS);
@@ -37,20 +38,29 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         const savedProduct = await api.post('/products', product);
         setProducts(prev => [savedProduct, ...prev]);
     } catch (e) {
-        console.error(e);
-        // Optimistic update
-        setProducts(prev => [product, ...prev]);
+        console.error("Failed to add product", e);
+        throw e;
     }
   };
 
-  const updateProduct = (id: string, updates: Partial<Product>) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
-    // In real app, send PUT request here
+  const updateProduct = async (id: string, updates: Partial<Product>) => {
+    try {
+        const updated = await api.put(`/products/${id}`, updates);
+        setProducts(prev => prev.map(p => p.id === id ? updated : p));
+    } catch (e) {
+        console.error("Failed to update product", e);
+        alert("Failed to update product");
+    }
   };
 
-  const deleteProduct = (id: string) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
-    // In real app, send DELETE request here
+  const deleteProduct = async (id: string) => {
+    try {
+        await api.delete(`/products/${id}`);
+        setProducts(prev => prev.filter(p => p.id !== id));
+    } catch (e) {
+        console.error("Failed to delete product", e);
+        alert("Failed to delete product");
+    }
   };
 
   return (

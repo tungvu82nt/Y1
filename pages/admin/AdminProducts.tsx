@@ -161,7 +161,7 @@ export const AdminProducts = () => {
         {isModalOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                 <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleCloseModal}></div>
-                <div className="relative bg-white dark:bg-[#1a1a1a] w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-pulse-fast">
+                <div className="relative bg-white dark:bg-[#1a1a1a] w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
                     <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-black/20">
                         <h3 className="font-bold text-lg text-slate-900 dark:text-white">{editingProduct ? t('admin.edit_product') : t('admin.add_product')}</h3>
                         <button onClick={handleCloseModal} className="text-gray-400 hover:text-slate-900 dark:hover:text-white">

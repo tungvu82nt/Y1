@@ -19,6 +19,7 @@ export const AdminLayout = () => {
       { icon: 'dashboard', label: t('admin.dashboard'), path: '/admin' },
       { icon: 'inventory_2', label: t('admin.products'), path: '/admin/products' },
       { icon: 'shopping_bag', label: t('admin.orders'), path: '/admin/orders' },
+      { icon: 'currency_exchange', label: 'Currencies', path: '/admin/currencies' },
   ];
 
   return (

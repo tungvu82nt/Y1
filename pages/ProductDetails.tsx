@@ -7,6 +7,7 @@ import { useCompare } from '../contexts/CompareContext';
 import { useToast } from '../contexts/ToastContext';
 import { useProducts } from '../contexts/ProductContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 export const ProductDetails = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export const ProductDetails = () => {
   const { addToCompare } = useCompare();
   const { showToast } = useToast();
   const { t } = useLanguage();
+  const { formatPrice } = useCurrency();
   
   // Find product by ID from Context (allowing for Admin updates to be reflected)
   const product = products.find(p => p.id === id);
@@ -143,9 +145,9 @@ export const ProductDetails = () => {
                                 <span className="text-sm font-semibold underline decoration-gray-300 underline-offset-4 cursor-pointer">{product.reviews || 120} {t('product.reviews')}</span>
                             </div>
                             <div className="flex flex-col items-end">
-                                <span className="text-3xl font-bold text-primary">${product.price.toFixed(2)}</span>
+                                <span className="text-3xl font-bold text-primary">{formatPrice(product.price)}</span>
                                 {product.originalPrice && (
-                                    <span className="text-sm text-gray-400 line-through font-medium">${product.originalPrice.toFixed(2)}</span>
+                                    <span className="text-sm text-gray-400 line-through font-medium">{formatPrice(product.originalPrice)}</span>
                                 )}
                             </div>
                         </div>
@@ -206,7 +208,7 @@ export const ProductDetails = () => {
                 <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between gap-3">
                         <div className="flex flex-col">
                         <span className="font-bold text-[#1b0d0e] dark:text-white truncate max-w-[120px]">{product.name}</span>
-                        <span className="text-sm text-primary font-bold">${product.price.toFixed(2)}</span>
+                        <span className="text-sm text-primary font-bold">{formatPrice(product.price)}</span>
                     </div>
                     <div className="flex gap-2">
                         <button onClick={handleAddToCart} className="h-10 px-4 rounded-full border border-gray-300 dark:border-white/20 font-bold text-[#1b0d0e] dark:text-white text-sm">Add</button>

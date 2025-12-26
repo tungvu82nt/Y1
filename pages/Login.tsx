@@ -9,9 +9,9 @@ export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      login(email);
+      await login(email, password);
       if (email.includes('admin')) {
           navigate('/admin');
       } else {
@@ -40,12 +40,15 @@ export const Login = () => {
                 <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400 text-[20px]">mail</span>
                     <input 
+                        id="email"
+                        name="email"
                         className="w-full h-12 bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-xl pl-11 pr-4 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
                         type="email" 
                         placeholder="Enter your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        autoComplete="email"
                     />
                 </div>
             </div>
@@ -55,12 +58,15 @@ export const Login = () => {
                 <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400 text-[20px]">lock</span>
                     <input 
+                        id="password"
+                        name="password"
                         className="w-full h-12 bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-xl pl-11 pr-4 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
                         type="password" 
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        autoComplete="current-password"
                     />
                 </div>
                 <div className="flex justify-end mt-1">

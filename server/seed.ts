@@ -1,6 +1,7 @@
 
 import { PrismaClient } from '@prisma/client';
-import { PRODUCTS, USER } from '../constants.js'; // Ensure constants.ts is treated as module
+import { PRODUCTS, USER } from '../constants.ts'; // Ensure constants.ts is treated as module
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -28,42 +29,125 @@ async function main() {
         image: p.image,
         rating: p.rating || 0,
         reviews: p.reviews || 0,
-        tags: p.tags || []
+        tags: JSON.stringify(p.tags || []),
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     });
   }
   console.log(`✅ Seeded ${PRODUCTS.length} products`);
 
   // Seed Admin User
+  const hashedAdminPassword = await bcrypt.hash('admin123', 10);
   await prisma.user.create({
     data: {
       email: 'admin@yapee.com',
-      password: 'hashed_secret', // Demo
+      password: hashedAdminPassword,
       name: 'System Admin',
       role: 'admin',
       location: 'Yapee HQ',
       avatar: 'https://ui-avatars.com/api/?name=Admin&background=ed1d23&color=fff',
       isVip: true,
-      memberSince: '2020'
+      memberSince: '2020',
+      createdAt: new Date(),
+      updatedAt: new Date()
     }
   });
 
   // Seed Demo Customer
+  const hashedUserPassword = await bcrypt.hash('password123', 10);
   await prisma.user.create({
     data: {
       email: 'alex@example.com',
-      password: 'password123',
+      password: hashedUserPassword,
       name: USER.name,
       avatar: USER.avatar,
       location: USER.location,
       role: 'customer',
       memberSince: USER.memberSince,
       isVip: USER.isVip,
-      phone: '+1 (555) 123-4567'
+      phone: '+1 (555) 123-4567',
+      createdAt: new Date(),
+      updatedAt: new Date()
     }
   });
 
   console.log('✅ Seeded users');
+
+  // Seed Sample Orders
+  const adminUser = await prisma.user.findUnique({ where: { email: 'admin@yapee.com' } });
+  const customerUser = await prisma.user.findUnique({ where: { email: 'alex@example.com' } });
+  const firstProduct = await prisma.product.findFirst();
+
+  if (adminUser && firstProduct) {
+    await prisma.order.create({
+      data: {
+        userId: adminUser.id,
+        subtotal: 199.98,
+        tax: 16.00,
+        total: 215.98,
+        shippingAddress: JSON.stringify({
+          street: '123 Admin Street',
+          city: 'Admin City',
+          state: 'AD',
+          zipCode: '12345',
+          country: 'USA'
+        }),
+        paymentMethod: 'credit_card',
+        estimatedDelivery: '2025-12-30',
+        status: 'processing',
+        date: new Date(),
+        updatedAt: new Date(),
+        items: {
+          create: [
+            {
+              productId: firstProduct.id,
+              quantity: 2,
+              selectedSize: 'M',
+              selectedColor: 'Black',
+              priceAtTime: firstProduct.price
+            }
+          ]
+        }
+      }
+    });
+  }
+
+  if (customerUser && firstProduct) {
+    await prisma.order.create({
+      data: {
+        userId: customerUser.id,
+        subtotal: 99.99,
+        tax: 8.00,
+        total: 107.99,
+        shippingAddress: JSON.stringify({
+          street: '456 Customer Ave',
+          city: 'Customer Town',
+          state: 'CT',
+          zipCode: '67890',
+          country: 'USA'
+        }),
+        paymentMethod: 'paypal',
+        estimatedDelivery: '2025-12-28',
+        status: 'shipped',
+        date: new Date(Date.now() - 86400000),
+        updatedAt: new Date(),
+        items: {
+          create: [
+            {
+              productId: firstProduct.id,
+              quantity: 1,
+              selectedSize: 'L',
+              selectedColor: 'White',
+              priceAtTime: firstProduct.price
+            }
+          ]
+        }
+      }
+    });
+  }
+
+  console.log('✅ Seeded orders');
 }
 
 main()

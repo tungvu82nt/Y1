@@ -32,7 +32,7 @@ export const AdminOrders = () => {
                             <td className="px-6 py-4 font-medium dark:text-white">#{order.id}</td>
                             <td className="px-6 py-4 text-gray-500">{order.date}</td>
                             <td className="px-6 py-4 text-gray-900 dark:text-white font-medium">
-                                {order.shippingAddress.split(',')[0] || 'Guest'}
+                                {typeof order.shippingAddress === 'string' ? order.shippingAddress.split(',')[0] : 'Guest'}
                             </td>
                             <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">${order.total.toFixed(2)}</td>
                             <td className="px-6 py-4">

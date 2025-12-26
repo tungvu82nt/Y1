@@ -3,11 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { useCart } from '../contexts/CartContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 export const Cart = () => {
     const navigate = useNavigate();
     const { cartItems, updateQuantity, removeFromCart, subtotal } = useCart();
     const { t } = useLanguage();
+    const { formatPrice } = useCurrency();
 
     const shipping = 0; // Free
     const tax = subtotal * 0.08; // Estimated 8%
@@ -67,7 +69,7 @@ export const Cart = () => {
                                         <span className="font-bold w-4 text-center text-sm">{item.quantity}</span>
                                         <button onClick={() => updateQuantity(index, 1)} className="size-8 flex items-center justify-center rounded-full bg-primary text-white shadow-sm hover:bg-red-700"><span className="material-symbols-outlined text-sm">add</span></button>
                                     </div>
-                                    <div className="text-right"><p className="text-xl font-bold text-slate-900 dark:text-white">${(item.price * item.quantity).toFixed(2)}</p></div>
+                                    <div className="text-right"><p className="text-xl font-bold text-slate-900 dark:text-white">{formatPrice(item.price * item.quantity)}</p></div>
                                 </div>
                             </div>
                         </div>
@@ -95,7 +97,7 @@ export const Cart = () => {
                     <div className="flex flex-col gap-3">
                         <div className="flex justify-between text-base text-gray-600 dark:text-gray-300">
                             <span>{t('common.subtotal')}</span>
-                            <span className="font-bold text-slate-900 dark:text-white">${subtotal.toFixed(2)}</span>
+                            <span className="font-bold text-slate-900 dark:text-white">{formatPrice(subtotal)}</span>
                         </div>
                         <div className="flex justify-between text-base text-gray-600 dark:text-gray-300">
                             <span>{t('common.shipping')}</span>
@@ -103,13 +105,13 @@ export const Cart = () => {
                         </div>
                         <div className="flex justify-between text-base text-gray-600 dark:text-gray-300">
                             <span>{t('common.tax')} (Est. 8%)</span>
-                            <span className="font-bold text-slate-900 dark:text-white">${tax.toFixed(2)}</span>
+                            <span className="font-bold text-slate-900 dark:text-white">{formatPrice(tax)}</span>
                         </div>
                     </div>
                     <div className="h-px bg-gray-100 dark:bg-white/10 w-full"></div>
                     <div className="flex justify-between items-center">
                         <span className="text-lg font-bold text-slate-900 dark:text-white">{t('common.total')}</span>
-                        <span className="text-3xl font-black text-slate-900 dark:text-white">${total.toFixed(2)}</span>
+                        <span className="text-3xl font-black text-slate-900 dark:text-white">{formatPrice(total)}</span>
                     </div>
                     <button disabled={cartItems.length === 0} onClick={() => navigate('/checkout')} className="group w-full bg-primary hover:bg-red-700 text-white font-bold text-lg py-4 rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
                          {t('cart.checkout')}
