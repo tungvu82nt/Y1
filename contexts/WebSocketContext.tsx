@@ -33,7 +33,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     // Assume backend is on same host if relative, or hardcoded port 3001 if dev
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const host = window.location.hostname;
-    const port = "3001"; // Default backend port
+    const port = "5000"; // Match server PORT from .env
 
     const wsUrl = `${protocol}//${host}:${port}/ws${
       user ? `?userId=${(user as any).id}` : ""
