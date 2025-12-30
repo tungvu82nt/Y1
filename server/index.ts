@@ -16,6 +16,7 @@ import { context } from './graphql/context.ts';
 import productRoutes from './routes/product.routes.ts';
 import authRoutes from './routes/auth.routes.ts';
 import orderRoutes from './routes/order.routes.ts';
+import cartRoutes from './routes/cart.routes.ts';
 
 dotenv.config();
 
@@ -110,6 +111,7 @@ const apolloServer = new ApolloServer({
   app.use('/api/products', productRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/orders', orderRoutes);
+  app.use('/api/cart', cartRoutes);
 
   // Health Check
   app.get('/api/health', (req, res) => {

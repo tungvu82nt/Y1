@@ -3,10 +3,13 @@ import { useOrder } from '../../contexts/OrderContext';
 import { useProducts } from '../../contexts/ProductContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 
+import { useWebSocket } from '../../contexts/WebSocketContext';
+
 export const AdminDashboard = () => {
   const { orders } = useOrder();
   const { products } = useProducts();
   const { t } = useLanguage();
+  const { isConnected } = useWebSocket();
 
   const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
   const pendingOrders = orders.filter(o => o.status === 'Processing').length;
@@ -14,6 +17,12 @@ export const AdminDashboard = () => {
 
   return (
     <div className="flex flex-col gap-8">
+        {/* Real-time Status Banner */}
+        <div className={`w-full px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold ${isConnected ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+            <span className={`block size-2.5 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
+            {isConnected ? 'Real-time System Active' : 'Connecting to Real-time Server...'}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
                 { label: t('admin.total_revenue'), value: `$${totalRevenue.toFixed(2)}`, icon: 'attach_money', color: 'bg-green-500' },

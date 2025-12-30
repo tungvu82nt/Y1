@@ -1,6 +1,7 @@
 import React from 'react';
 import { HashRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { WebSocketProvider } from './contexts/WebSocketContext';
 import { CartProvider } from './contexts/CartContext';
 import { OrderProvider } from './contexts/OrderContext';
 import { WishlistProvider } from './contexts/WishlistContext';
@@ -49,53 +50,55 @@ const App = () => {
     <LanguageProvider>
       <CurrencyProvider>
         <AuthProvider>
-          <ProductProvider>
-            <CartProvider>
-                <OrderProvider>
-                <WishlistProvider>
-                    <CompareProvider>
-                    <ToastProvider>
-                        <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-                        <ScrollToTop />
-                        <Routes>
-                            {/* Public Routes */}
-                            <Route path="/" element={<Home />} />
-                            <Route path="/product/:id" element={<ProductDetails />} />
-                            <Route path="/cart" element={<Cart />} />
-                            <Route path="/checkout" element={<Checkout />} />
-                            <Route path="/success" element={<Success />} />
-                            <Route path="/track-order" element={<TrackOrder />} />
-                            <Route path="/profile" element={<Profile />} />
-                            <Route path="/search" element={<Search />} />
-                            <Route path="/categories" element={<Search />} />
-                            <Route path="/wishlist" element={<Wishlist />} />
-                            <Route path="/compare" element={<Compare />} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/register" element={<Register />} />
+          <WebSocketProvider>
+            <ProductProvider>
+              <CartProvider>
+                  <OrderProvider>
+                  <WishlistProvider>
+                      <CompareProvider>
+                      <ToastProvider>
+                          <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                          <ScrollToTop />
+                          <Routes>
+                              {/* Public Routes */}
+                              <Route path="/" element={<Home />} />
+                              <Route path="/product/:id" element={<ProductDetails />} />
+                              <Route path="/cart" element={<Cart />} />
+                              <Route path="/checkout" element={<Checkout />} />
+                              <Route path="/success" element={<Success />} />
+                              <Route path="/track-order" element={<TrackOrder />} />
+                              <Route path="/profile" element={<Profile />} />
+                              <Route path="/search" element={<Search />} />
+                              <Route path="/categories" element={<Search />} />
+                              <Route path="/wishlist" element={<Wishlist />} />
+                              <Route path="/compare" element={<Compare />} />
+                              <Route path="/login" element={<Login />} />
+                              <Route path="/register" element={<Register />} />
 
-                            {/* Admin Routes */}
-                            <Route path="/admin" element={
-                                <ProtectedAdminRoute>
-                                    <AdminLayout />
-                                </ProtectedAdminRoute>
-                            }>
-                                <Route index element={<AdminDashboard />} />
-                                <Route path="dashboard" element={<AdminDashboard />} />
-                                <Route path="products" element={<AdminProducts />} />
-                                <Route path="orders" element={<AdminOrders />} />
-                                <Route path="currencies" element={<AdminCurrencies />} />
-                            </Route>
-                            
-                            {/* Error Route */}
-                            <Route path="*" element={<NotFound />} />
-                        </Routes>
-                        </HashRouter>
-                    </ToastProvider>
-                    </CompareProvider>
-                </WishlistProvider>
-                </OrderProvider>
-            </CartProvider>
-          </ProductProvider>
+                              {/* Admin Routes */}
+                              <Route path="/admin" element={
+                                  <ProtectedAdminRoute>
+                                      <AdminLayout />
+                                  </ProtectedAdminRoute>
+                              }>
+                                  <Route index element={<AdminDashboard />} />
+                                  <Route path="dashboard" element={<AdminDashboard />} />
+                                  <Route path="products" element={<AdminProducts />} />
+                                  <Route path="orders" element={<AdminOrders />} />
+                                  <Route path="currencies" element={<AdminCurrencies />} />
+                              </Route>
+                              
+                              {/* Error Route */}
+                              <Route path="*" element={<NotFound />} />
+                          </Routes>
+                          </HashRouter>
+                      </ToastProvider>
+                      </CompareProvider>
+                  </WishlistProvider>
+                  </OrderProvider>
+              </CartProvider>
+            </ProductProvider>
+          </WebSocketProvider>
         </AuthProvider>
       </CurrencyProvider>
     </LanguageProvider>

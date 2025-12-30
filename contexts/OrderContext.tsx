@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Order, CartItem } from '../types';
 import { api } from '../utils/api';
 import { useAuth } from './AuthContext';
+import { useWebSocket } from './WebSocketContext';
 
 interface OrderContextType {
   orders: Order[];
@@ -17,6 +18,25 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [orders, setOrders] = useState<Order[]>([]);
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const { user } = useAuth();
+  const { subscribe } = useWebSocket();
+
+  useEffect(() => {
+    // Subscribe to real-time order updates
+    const unsubscribeUpdated = subscribe('order_updated', (data: any) => {
+        console.log("🔔 Real-time Order Update Received:", data);
+        setOrders(prev => prev.map(o => o.id === data.id ? { ...o, status: data.status } : o));
+    });
+
+    const unsubscribeCreated = subscribe('order_created', (data: any) => {
+        console.log("🔔 Real-time New Order Received:", data);
+        setOrders(prev => [data, ...prev]);
+    });
+
+    return () => {
+        unsubscribeUpdated();
+        unsubscribeCreated();
+    };
+  }, [subscribe]);
 
   useEffect(() => {
     const fetchOrders = async () => {
