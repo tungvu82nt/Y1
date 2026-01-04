@@ -1,3 +1,13 @@
+/**
+ * Main application component that provides all context providers and routing
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * // App component is rendered at root
+ * ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+ * ```
+ */
 import React from 'react';
 import { HashRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -10,6 +20,7 @@ import { ToastProvider } from './contexts/ToastContext';
 import { ProductProvider } from './contexts/ProductContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import { Home } from './pages/Home';
 import { ProductDetails } from './pages/ProductDetails';
 import { Cart } from './pages/Cart';
@@ -47,19 +58,20 @@ const ProtectedAdminRoute = ({ children }: { children?: React.ReactNode }) => {
 
 const App = () => {
   return (
-    <LanguageProvider>
-      <CurrencyProvider>
-        <AuthProvider>
-          <WebSocketProvider>
-            <ProductProvider>
-              <CartProvider>
-                  <OrderProvider>
-                  <WishlistProvider>
-                      <CompareProvider>
-                      <ToastProvider>
-                          <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-                          <ScrollToTop />
-                          <Routes>
+    <ErrorBoundary>
+      <LanguageProvider>
+        <CurrencyProvider>
+          <AuthProvider>
+            <WebSocketProvider>
+              <ProductProvider>
+                <CartProvider>
+                    <OrderProvider>
+                    <WishlistProvider>
+                        <CompareProvider>
+                        <ToastProvider>
+                            <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                            <ScrollToTop />
+                            <Routes>
                               {/* Public Routes */}
                               <Route path="/" element={<Home />} />
                               <Route path="/product/:id" element={<ProductDetails />} />
@@ -92,16 +104,17 @@ const App = () => {
                               <Route path="*" element={<NotFound />} />
                           </Routes>
                           </HashRouter>
-                      </ToastProvider>
-                      </CompareProvider>
-                  </WishlistProvider>
-                  </OrderProvider>
-              </CartProvider>
-            </ProductProvider>
-          </WebSocketProvider>
-        </AuthProvider>
-      </CurrencyProvider>
-    </LanguageProvider>
+                        </ToastProvider>
+                        </CompareProvider>
+                    </WishlistProvider>
+                    </OrderProvider>
+                </CartProvider>
+              </ProductProvider>
+            </WebSocketProvider>
+          </AuthProvider>
+        </CurrencyProvider>
+      </LanguageProvider>
+    </ErrorBoundary>
   );
 };
 

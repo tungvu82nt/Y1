@@ -35,7 +35,15 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
     if (error instanceof z.ZodError) {
-      throw ApiError.badRequest('VALIDATION_ERROR', 'Validation failed', error.issues);
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Validation failed',
+          details: error.issues
+        }
+      });
+      return;
     }
     const errorMessage = error instanceof Error ? error.message : 'Login failed';
     res.status(401).json({

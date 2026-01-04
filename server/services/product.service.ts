@@ -41,10 +41,11 @@ interface CreateProductInput {
 
 interface UpdateProductInput extends Partial<CreateProductInput> {}
 
-function formatProduct(product: Product): { [key: string]: unknown } {
+function formatProduct(product: any): { [key: string]: unknown } {
   return {
     ...product,
-    tags: JSON.parse(product.tags),
+    price: product.price ? Number(product.price) : 0,
+    originalPrice: product.originalPrice ? Number(product.originalPrice) : null,
   };
 }
 
@@ -75,10 +76,10 @@ export const productService = {
     if (minPrice !== undefined || maxPrice !== undefined) {
       where.price = {};
       if (minPrice !== undefined) {
-        (where.price as Prisma.FloatFilter).gte = minPrice;
+        (where.price as Prisma.DecimalFilter).gte = minPrice;
       }
       if (maxPrice !== undefined) {
-        (where.price as Prisma.FloatFilter).lte = maxPrice;
+        (where.price as Prisma.DecimalFilter).lte = maxPrice;
       }
     }
 
@@ -95,6 +96,9 @@ export const productService = {
         skip,
         take,
         orderBy,
+        include: {
+          variants: true,
+        },
       }),
       prisma.product.count({ where }),
     ]);
@@ -120,37 +124,46 @@ export const productService = {
     return result;
   },
 
-  async getProductById(id: string): Promise<Product | null> {
+  async getProductById(id: string): Promise<any | null> {
     const product = await prisma.product.findUnique({
       where: { id },
+      include: {
+        variants: true,
+      },
     });
-    return product;
+    return product ? formatProduct(product) : null;
   },
 
-  async createProduct(data: CreateProductInput): Promise<Product> {
+  async createProduct(data: CreateProductInput): Promise<any> {
     const { tags, ...otherData } = data;
     const product = await prisma.product.create({
       data: {
         ...otherData,
-        tags: JSON.stringify(tags || []),
+        tags: tags || [],
         updatedAt: new Date(),
+      },
+      include: {
+        variants: true,
       },
     });
     await cacheService.delPattern('products:*');
-    return product;
+    return formatProduct(product);
   },
 
-  async updateProduct(id: string, data: UpdateProductInput): Promise<Product> {
+  async updateProduct(id: string, data: UpdateProductInput): Promise<any> {
     const { tags, ...otherData } = data;
     const product = await prisma.product.update({
       where: { id },
       data: {
         ...otherData,
-        ...(tags && { tags: JSON.stringify(tags) }),
+        ...(tags && { tags }),
+      },
+      include: {
+        variants: true,
       },
     });
     await cacheService.delPattern('products:*');
-    return product;
+    return formatProduct(product);
   },
 
   async deleteProduct(id: string): Promise<void> {

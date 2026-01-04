@@ -14,6 +14,14 @@ export const typeDefs = `#graphql
     orders: [Order!]!
   }
 
+  type ProductVariant {
+    id: ID!
+    productId: String!
+    size: String!
+    color: String!
+    stock: Int!
+  }
+
   type Product {
     id: ID!
     name: String!
@@ -28,6 +36,7 @@ export const typeDefs = `#graphql
     tags: [String!]!
     createdAt: String!
     updatedAt: String!
+    variants: [ProductVariant!]!
   }
 
   type OrderItem {

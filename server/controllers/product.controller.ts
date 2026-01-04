@@ -45,7 +45,7 @@ export const getProductById = async (req: Request, res: Response): Promise<void>
 
     res.json({
       success: true,
-      data: { ...product, tags: JSON.parse(product.tags) },
+      data: product,
     });
   } catch (error: unknown) {
     if (error instanceof ApiError) {
@@ -70,7 +70,7 @@ export const createProduct = async (req: AuthenticatedRequest, res: Response): P
 
     res.status(201).json({
       success: true,
-      data: { ...product, tags: JSON.parse(product.tags) },
+      data: product,
     });
   } catch (error: unknown) {
     if (error instanceof ApiError) {
@@ -99,7 +99,7 @@ export const updateProduct = async (req: AuthenticatedRequest, res: Response): P
 
     res.json({
       success: true,
-      data: { ...product, tags: JSON.parse(product.tags) },
+      data: product,
     });
   } catch (error: unknown) {
     if (error instanceof ApiError) {

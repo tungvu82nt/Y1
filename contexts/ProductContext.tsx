@@ -19,17 +19,31 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   useEffect(() => {
     const fetchProducts = async () => {
-        try {
-            const response = await api.get('/products');
-            const products = response.data || response;
-            setProducts(products);
-        } catch (error) {
-            console.error("Failed to load products from server, using fallback", error);
-            setProducts(FALLBACK_PRODUCTS);
-        } finally {
-            setLoading(false);
+      try {
+        const response = await api.get<unknown>('/products');
+
+        // Backend returns either:
+        // - { data: Product[], pagination: {...} }
+        // - or a wrapped shape { success, data }
+        const topLevelData = (response as { data?: unknown }).data;
+
+        let list: unknown = topLevelData;
+        if (!Array.isArray(list) && list && typeof list === 'object') {
+          const inner = (list as Record<string, unknown>).data;
+          if (Array.isArray(inner)) {
+            list = inner;
+          }
         }
+
+        setProducts(Array.isArray(list) ? (list as Product[]) : []);
+      } catch (error) {
+        console.error('Failed to load products from server, using fallback', error);
+        setProducts(FALLBACK_PRODUCTS);
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchProducts();
   }, []);
 

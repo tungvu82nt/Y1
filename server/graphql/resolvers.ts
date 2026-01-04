@@ -20,7 +20,11 @@ export const resolvers = {
         search,
       });
 
-      return await productService.getProducts(validatedQuery);
+      const result = await productService.getProducts(validatedQuery);
+      return {
+        products: result.data,
+        pagination: result.pagination
+      };
     },
 
     product: async (_: unknown, args: { id: string }) => {
@@ -28,7 +32,7 @@ export const resolvers = {
       if (!product) {
         throw new Error('Product not found');
       }
-      return { ...product, tags: JSON.parse(product.tags) };
+      return product;
     },
 
     orders: async (_: unknown, args: { userId?: string }) => {
@@ -63,13 +67,13 @@ export const resolvers = {
     createProduct: async (_: unknown, args: { input: { name: string; brand: string; category: string; price: number; originalPrice?: number; discount?: string; image: string; rating?: number; reviews?: number; tags?: string[] } }) => {
       const validatedData = productService.validateCreateProduct(args.input);
       const product = await productService.createProduct(validatedData);
-      return { ...product, tags: JSON.parse(product.tags) };
+      return product;
     },
 
     updateProduct: async (_: unknown, args: { id: string; input: { name?: string; brand?: string; category?: string; price?: number; originalPrice?: number; discount?: string; image?: string; rating?: number; reviews?: number; tags?: string[] } }) => {
       const validatedData = productService.validateUpdateProduct(args.input);
       const product = await productService.updateProduct(args.id, validatedData);
-      return { ...product, tags: JSON.parse(product.tags) };
+      return product;
     },
 
     deleteProduct: async (_: unknown, args: { id: string }) => {
@@ -144,11 +148,16 @@ export const resolvers = {
     product: async (parent: { productId: string }) => {
       const product = await prisma.product.findUnique({
         where: { id: parent.productId },
+        include: { variants: true }
       });
       if (!product) {
         throw new Error('Product not found');
       }
-      return { ...product, tags: JSON.parse(product.tags) };
+      return {
+        ...product,
+        price: Number(product.price),
+        originalPrice: product.originalPrice ? Number(product.originalPrice) : null,
+      };
     },
   },
 };

@@ -1,6 +1,21 @@
 
+/**
+ * Supported languages for the application
+ * 
+ * @type {'en' | 'vi' | 'zh'}
+ */
 export type Language = 'en' | 'vi' | 'zh';
 
+/**
+ * Multi-language translation object containing all UI text strings
+ * 
+ * @constant
+ * @type {object}
+ * @example
+ * // Get English translation
+ * const enText = translations.en.common.searchPlaceholder;
+ * console.log(enText); // "Search for shoes, brands..."
+ */
 export const translations = {
   en: {
     common: {

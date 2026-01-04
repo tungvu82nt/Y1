@@ -77,22 +77,22 @@ interface RawOrderResponse {
   }>;
 }
 
-function formatOrderForFrontend(order: RawOrderResponse): OrderResponse {
+function formatOrderForFrontend(order: any): OrderResponse {
   return {
     id: order.id,
     userId: order.userId,
-    subtotal: order.subtotal,
-    tax: order.tax,
-    total: order.total,
-    shippingAddress: JSON.parse(order.shippingAddress) as ShippingAddress,
+    subtotal: Number(order.subtotal),
+    tax: Number(order.tax),
+    total: Number(order.total),
+    shippingAddress: typeof order.shippingAddress === 'string' ? JSON.parse(order.shippingAddress) : order.shippingAddress,
     paymentMethod: order.paymentMethod,
     estimatedDelivery: order.estimatedDelivery,
     status: order.status,
     date: order.date.toLocaleDateString(),
-    items: order.items.map(item => ({
+    items: order.items.map((item: any) => ({
       id: item.product.id,
       name: item.product.name,
-      price: item.product.price,
+      price: Number(item.priceAtTime),
       image: item.product.image,
       quantity: item.quantity,
       selectedSize: item.selectedSize,
@@ -117,7 +117,7 @@ export const orderService = {
           include: { product: true },
         },
       },
-      orderBy: { date: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
 
     const result = orders.map(formatOrderForFrontend);
@@ -149,40 +149,63 @@ export const orderService = {
   async createOrder(input: CreateOrderInput): Promise<OrderResponse> {
     const { userId, items, subtotal, tax, total, shippingAddress } = input;
 
-    const order = await prisma.order.create({
-      data: {
-        user: {
-          connect: {
-            id: userId,
+    const order = await prisma.$transaction(async (tx) => {
+      for (const item of items) {
+        const variant = await tx.productVariant.findUnique({
+          where: {
+            productId_size_color: {
+              productId: item.id,
+              size: item.selectedSize,
+              color: item.selectedColor,
+            }
+          }
+        });
+
+        if (!variant || variant.stock < item.quantity) {
+          throw new Error(`Insufficient stock for product ${item.name} (${item.selectedSize}, ${item.selectedColor})`);
+        }
+
+        await tx.productVariant.update({
+          where: { id: variant.id },
+          data: { stock: { decrement: item.quantity } }
+        });
+      }
+
+      return await tx.order.create({
+        data: {
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+          subtotal,
+          tax,
+          total,
+          shippingAddress: JSON.stringify(shippingAddress),
+          paymentMethod: 'VISA ending in 4242',
+          estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toDateString(),
+          updatedAt: new Date(),
+          items: {
+            create: items.map((item: CartItem) => ({
+              productId: item.id,
+              quantity: item.quantity,
+              selectedSize: item.selectedSize,
+              selectedColor: item.selectedColor,
+              priceAtTime: item.price,
+            })),
           },
         },
-        subtotal,
-        tax,
-        total,
-        shippingAddress: JSON.stringify(shippingAddress),
-        paymentMethod: 'VISA ending in 4242',
-        estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toDateString(),
-        updatedAt: new Date(),
-        items: {
-          create: items.map((item: CartItem) => ({
-            productId: item.id,
-            quantity: item.quantity,
-            selectedSize: item.selectedSize,
-            selectedColor: item.selectedColor,
-            priceAtTime: item.price,
-          })),
+        include: {
+          items: {
+            include: { product: true },
+          },
         },
-      },
-      include: {
-        items: {
-          include: { product: true },
-        },
-      },
+      });
     });
 
     await cacheService.delPattern('orders:*');
 
-    const orderResponse = formatOrderForFrontend(order as unknown as RawOrderResponse);
+    const orderResponse = formatOrderForFrontend(order);
 
     wsService.sendToUser(userId, {
       type: 'order_created',
@@ -192,7 +215,7 @@ export const orderService = {
     return orderResponse;
   },
 
-  async updateOrderStatus(id: string, status: string): Promise<OrderResponse | null> {
+  async updateOrderStatus(id: string, status: any): Promise<OrderResponse | null> {
     const order = await prisma.order.update({
       where: { id },
       data: { status },

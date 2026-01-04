@@ -1,0 +1,480 @@
+{
+  "metadata": {
+    "totalFiles": 129,
+    "filesRequiringChanges": 58,
+    "estimatedTotalHours": 40,
+    "lastUpdated": "2025-12-30"
+  },
+  "fileTasks": {
+    "typeSafety": [
+      {
+        "file": "utils/api.ts",
+        "priority": "High",
+        "issues": [
+          {
+            "line": 24,
+            "type": "any",
+            "description": "post method uses 'any' for data parameter",
+            "fix": "Create generic ApiResponse interface"
+          },
+          {
+            "line": 37,
+            "type": "any", 
+            "description": "put method uses 'any' for data parameter",
+            "fix": "Use same ApiResponse interface"
+          }
+        ],
+        "estimatedHours": 1,
+        "dependencies": [],
+        "verification": "TypeScript compilation passes"
+      },
+      {
+        "file": "contexts/WebSocketContext.tsx",
+        "priority": "High",
+        "issues": [
+          {
+            "line": 10,
+            "type": "any",
+            "description": "MessageHandler uses 'any' for data",
+            "fix": "Create WebSocketMessage interface"
+          },
+          {
+            "line": 15,
+            "type": "any",
+            "description": "send method uses 'any' for data",
+            "fix": "Use generic WebSocketMessage interface"
+          },
+          {
+            "line": 112,
+            "type": "any",
+            "description": "send implementation uses 'any'",
+            "fix": "Apply type constraint"
+          }
+        ],
+        "estimatedHours": 1.5,
+        "dependencies": ["types/websocket.ts"],
+        "verification": "All message handlers properly typed"
+      },
+      {
+        "file": "contexts/OrderContext.tsx",
+        "priority": "High",
+        "issues": [
+          {
+            "line": 25,
+            "type": "any",
+            "description": "order_updated subscription uses 'any'",
+            "fix": "Create OrderUpdateMessage interface"
+          },
+          {
+            "line": 30,
+            "type": "any",
+            "description": "order_created subscription uses 'any'",
+            "fix": "Create OrderCreateMessage interface"
+          }
+        ],
+        "estimatedHours": 1,
+        "dependencies": ["types/websocket.ts", "types/order.ts"],
+        "verification": "Order messages properly typed"
+      },
+      {
+        "file": "contexts/LanguageContext.tsx",
+        "priority": "Medium",
+        "issues": [
+          {
+            "line": 29,
+            "type": "any",
+            "description": "Translation value uses 'any'",
+            "fix": "Type translation lookup properly"
+          },
+          {
+            "line": 36,
+            "type": "any",
+            "description": "Fallback translation uses 'any'",
+            "fix": "Apply proper typing"
+          }
+        ],
+        "estimatedHours": 0.5,
+        "dependencies": [],
+        "verification": "Translation typing passes"
+      },
+      {
+        "file": "contexts/CartContext.tsx",
+        "priority": "High",
+        "issues": [
+          {
+            "line": 44,
+            "type": "any",
+            "description": "API response mapping uses 'any'",
+            "fix": "Create CartResponse interface"
+          }
+        ],
+        "estimatedHours": 1,
+        "dependencies": ["types/api.ts"],
+        "verification": "Cart API properly typed"
+      },
+      {
+        "file": "pages/Wishlist.tsx",
+        "priority": "Medium",
+        "issues": [
+          {
+            "line": 15,
+            "type": "any",
+            "description": "handleAddToCart uses 'any' for product",
+            "fix": "Use Product type from types.ts"
+          }
+        ],
+        "estimatedHours": 0.5,
+        "dependencies": ["types.ts"],
+        "verification": "Product parameter properly typed"
+      },
+      {
+        "file": "pages/Compare.tsx",
+        "priority": "Medium",
+        "issues": [
+          {
+            "line": 12,
+            "type": "any",
+            "description": "handleAddToCart uses 'any' for product",
+            "fix": "Use Product type from types.ts"
+          }
+        ],
+        "estimatedHours": 0.5,
+        "dependencies": ["types.ts"],
+        "verification": "Product parameter properly typed"
+      },
+      {
+        "file": "pages/admin/AdminProducts.tsx",
+        "priority": "Medium",
+        "issues": [
+          {
+            "line": 54,
+            "type": "any",
+            "description": "productData uses 'any'",
+            "fix": "Create ProductFormData interface"
+          }
+        ],
+        "estimatedHours": 1,
+        "dependencies": ["types/product.ts"],
+        "verification": "Form data properly typed"
+      },
+      {
+        "file": "server/middleware/auth.middleware.ts",
+        "priority": "Low",
+        "issues": [
+          {
+            "line": 15,
+            "type": "any",
+            "description": "user property uses 'any'",
+            "fix": "Import proper User type"
+          }
+        ],
+        "estimatedHours": 0.5,
+        "dependencies": ["types.ts"],
+        "verification": "User property properly typed"
+      },
+      {
+        "file": "tests/auth.test.ts",
+        "priority": "Low",
+        "issues": [
+          {
+            "line": 166,
+            "type": "any",
+            "description": "mockNext uses 'any'",
+            "fix": "Create proper NextFunction type"
+          }
+        ],
+        "estimatedHours": 0.5,
+        "dependencies": [],
+        "verification": "Mock objects properly typed"
+      }
+    ],
+    "errorHandling": [
+      {
+        "file": "contexts/CartContext.tsx",
+        "priority": "High",
+        "issues": [
+          {
+            "line": 57,
+            "type": "missing_error_handling",
+            "description": "syncCart catch only logs error",
+            "fix": "Add user notification and retry logic"
+          }
+        ],
+        "estimatedHours": 2,
+        "dependencies": ["components/ErrorBoundary.tsx"],
+        "verification": "Cart sync errors handled gracefully"
+      },
+      {
+        "file": "contexts/AuthContext.tsx",
+        "priority": "High",
+        "issues": [
+          {
+            "line": "multiple",
+            "type": "missing_retry_logic",
+            "description": "No token refresh on 401 errors",
+            "fix": "Implement token refresh mechanism"
+          }
+        ],
+        "estimatedHours": 2,
+        "dependencies": ["utils/api.ts"],
+        "verification": "Token refresh implemented"
+      },
+      {
+        "file": "pages/ProductDetails.tsx",
+        "priority": "High",
+        "issues": [
+          {
+            "line": "multiple",
+            "type": "missing_error_boundary",
+            "description": "No error boundary for product loading",
+            "fix": "Wrap with ErrorBoundary"
+          }
+        ],
+        "estimatedHours": 1,
+        "dependencies": ["components/ErrorBoundary.tsx"],
+        "verification": "Product errors handled gracefully"
+      },
+      {
+        "file": "pages/Checkout.tsx",
+        "priority": "High",
+        "issues": [
+          {
+            "line": "multiple",
+            "type": "payment_error_handling",
+            "description": "No comprehensive payment error handling",
+            "fix": "Add payment error states and recovery"
+          }
+        ],
+        "estimatedHours": 3,
+        "dependencies": ["utils/payment-errors.ts"],
+        "verification": "Payment errors handled properly"
+      },
+      {
+        "file": "server/controllers/product.controller.ts",
+        "priority": "High",
+        "issues": [
+          {
+            "line": "multiple",
+            "type": "database_error_handling",
+            "description": "Missing database error handling",
+            "fix": "Add try-catch with proper error responses"
+          }
+        ],
+        "estimatedHours": 2,
+        "dependencies": [],
+        "verification": "Database errors handled properly"
+      },
+      {
+        "file": "server/services/order.service.ts",
+        "priority": "High",
+        "issues": [
+          {
+            "line": "multiple",
+            "type": "order_processing_errors",
+            "description": "Missing order processing error handling",
+            "fix": "Add comprehensive error handling"
+          }
+        ],
+        "estimatedHours": 3,
+        "dependencies": [],
+        "verification": "Order errors handled properly"
+      }
+    ],
+    "testCoverage": [
+      {
+        "file": "components/ProductCard.tsx",
+        "priority": "Medium",
+        "testType": "unit",
+        "estimatedHours": 2,
+        "testCases": [
+          "renders product information correctly",
+          "handles click events",
+          "displays discount badge",
+          "shows out of stock state"
+        ]
+      },
+      {
+        "file": "components/Layout.tsx",
+        "priority": "Medium",
+        "testType": "unit",
+        "estimatedHours": 3,
+        "testCases": [
+          "renders navigation",
+          "handles cart item count",
+          "displays user authentication state",
+          "responsive design works"
+        ]
+      },
+      {
+        "file": "contexts/ProductContext.tsx",
+        "priority": "Medium",
+        "testType": "unit",
+        "estimatedHours": 2.5,
+        "testCases": [
+          "loads products on mount",
+          "handles search functionality",
+          "manages loading states",
+          "handles API errors"
+        ]
+      },
+      {
+        "file": "utils/api.ts",
+        "priority": "High",
+        "testType": "unit",
+        "estimatedHours": 2,
+        "testCases": [
+          "handles successful responses",
+          "handles network errors",
+          "implements retry logic",
+          "manages request timeouts"
+        ]
+      },
+      {
+        "file": "server/services/product.service.ts",
+        "priority": "High",
+        "testType": "integration",
+        "estimatedHours": 3,
+        "testCases": [
+          "database operations",
+          "product search",
+          "inventory management",
+          "error scenarios"
+        ]
+      },
+      {
+        "file": "server/middleware/cache.middleware.ts",
+        "priority": "Medium",
+        "testType": "unit",
+        "estimatedHours": 1.5,
+        "testCases": [
+          "caches responses correctly",
+          "invalidates cache properly",
+          "handles cache errors",
+          "respects cache TTL"
+        ]
+      }
+    ],
+    "documentation": [
+      {
+        "file": "utils/translations.ts",
+        "priority": "Low",
+        "issues": [
+          {
+            "line": "multiple",
+            "type": "vietnamese_comments",
+            "description": "Contains Vietnamese translation strings",
+            "action": "Keep as-is (translations are intentional)"
+          }
+        ],
+        "estimatedHours": 0,
+        "action": "No changes needed"
+      },
+      {
+        "file": "docs/README.md",
+        "priority": "Low",
+        "issues": [
+          {
+            "line": "multiple",
+            "type": "mixed_language",
+            "description": "Contains mixed English and other languages",
+            "action": "Translate to English"
+          }
+        ],
+        "estimatedHours": 2,
+        "verification": "All documentation in English"
+      },
+      {
+        "file": "docs/API_SPEC.md",
+        "priority": "Low",
+        "issues": [
+          {
+            "line": "multiple",
+            "type": "mixed_language",
+            "description": "API documentation in multiple languages",
+            "action": "Standardize to English"
+          }
+        ],
+        "estimatedHours": 1.5,
+        "verification": "API docs in English only"
+      }
+    ]
+  },
+  "newFilesNeeded": [
+    {
+      "file": "types/api.ts",
+      "purpose": "API request/response type definitions",
+      "priority": "High",
+      "estimatedHours": 1
+    },
+    {
+      "file": "types/websocket.ts",
+      "purpose": "WebSocket message type definitions",
+      "priority": "High",
+      "estimatedHours": 0.5
+    },
+    {
+      "file": "types/order.ts",
+      "purpose": "Order-related type definitions",
+      "priority": "Medium",
+      "estimatedHours": 0.5
+    },
+    {
+      "file": "types/product.ts",
+      "purpose": "Product-related type definitions",
+      "priority": "Medium",
+      "estimatedHours": 0.5
+    },
+    {
+      "file": "components/ErrorBoundary.tsx",
+      "purpose": "React error boundary component",
+      "priority": "High",
+      "estimatedHours": 2
+    },
+    {
+      "file": "utils/error-handler.ts",
+      "purpose": "Centralized error handling utilities",
+      "priority": "High",
+      "estimatedHours": 2
+    },
+    {
+      "file": "utils/retry.ts",
+      "purpose": "Retry logic with exponential backoff",
+      "priority": "Medium",
+      "estimatedHours": 1.5
+    },
+    {
+      "file": "tests/setup/test-utils.tsx",
+      "purpose": "Test utilities and helpers",
+      "priority": "Medium",
+      "estimatedHours": 1
+    }
+  ],
+  "executionOrder": [
+    "Phase 1 - Type Safety (8 files, ~8 hours)",
+    "Phase 2 - Error Handling (6 files, ~13 hours)", 
+    "Phase 3 - Test Coverage (6 files, ~14 hours)",
+    "Phase 4 - Documentation (3 files, ~3.5 hours)"
+  ],
+  "successCriteria": {
+    "typeSafety": {
+      "target": "0 'any' types",
+      "measurement": "TypeScript compilation without errors",
+      "automatedCheck": true
+    },
+    "errorHandling": {
+      "target": "95% coverage",
+      "measurement": "Code review + automated testing",
+      "automatedCheck": false
+    },
+    "testCoverage": {
+      "target": "80% coverage",
+      "measurement": "Vitest coverage report",
+      "automatedCheck": true
+    },
+    "documentation": {
+      "target": "100% English",
+      "measurement": "Manual review",
+      "automatedCheck": false
+    }
+  }
+}

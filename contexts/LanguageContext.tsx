@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { translations, Language } from '../utils/translations';
 
+// Define a recursive type for nested translation objects
+type TranslationValue = string | { [key: string]: TranslationValue };
+
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
@@ -26,22 +29,26 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const t = (key: string): string => {
     const keys = key.split('.');
-    let value: any = translations[language];
     
-    for (const k of keys) {
-      if (value && value[k]) {
-        value = value[k];
-      } else {
-        // Fallback to English if key missing
-        let fallback: any = translations['en'];
-        for (const fk of keys) {
-            if (fallback && fallback[fk]) fallback = fallback[fk];
+    const findTranslation = (lang: Language): string => {
+      let current: TranslationValue = translations[lang];
+      for (const k of keys) {
+        if (typeof current === 'object' && current !== null && k in current) {
+          current = current[k];
+        } else {
+          return ''; // Not found
         }
-        return (typeof fallback === 'string') ? fallback : key;
       }
+      return typeof current === 'string' ? current : '';
+    };
+
+    let translation = findTranslation(language);
+
+    if (!translation && language !== 'en') {
+      translation = findTranslation('en');
     }
-    
-    return (typeof value === 'string') ? value : key;
+
+    return translation || key;
   };
 
   return (

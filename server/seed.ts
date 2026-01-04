@@ -1,6 +1,6 @@
 
 import { PrismaClient } from '@prisma/client';
-import { PRODUCTS, USER } from '../constants.ts'; // Ensure constants.ts is treated as module
+import { PRODUCTS, USER } from '../constants.ts';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -9,6 +9,8 @@ async function main() {
   console.log('🌱 Starting seeding...');
 
   // Seed Products
+  await prisma.cartItem.deleteMany();
+  await prisma.cart.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
   await prisma.product.deleteMany();
@@ -29,13 +31,22 @@ async function main() {
         image: p.image,
         rating: p.rating || 0,
         reviews: p.reviews || 0,
-        tags: JSON.stringify(p.tags || []),
+        tags: p.tags || [],
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        variants: {
+          create: [
+            { size: 'S', color: 'Black', stock: 10 },
+            { size: 'M', color: 'Black', stock: 15 },
+            { size: 'L', color: 'Black', stock: 5 },
+            { size: 'M', color: 'White', stock: 8 },
+            { size: 'L', color: 'White', stock: 12 },
+          ]
+        }
       }
     });
   }
-  console.log(`✅ Seeded ${PRODUCTS.length} products`);
+  console.log(`✅ Seeded ${PRODUCTS.length} products with variants`);
 
   // Seed Admin User
   const hashedAdminPassword = await bcrypt.hash('admin123', 10);
@@ -44,7 +55,7 @@ async function main() {
       email: 'admin@yapee.com',
       password: hashedAdminPassword,
       name: 'System Admin',
-      role: 'admin',
+      role: 'ADMIN',
       location: 'Yapee HQ',
       avatar: 'https://ui-avatars.com/api/?name=Admin&background=ed1d23&color=fff',
       isVip: true,
@@ -63,7 +74,7 @@ async function main() {
       name: USER.name,
       avatar: USER.avatar,
       location: USER.location,
-      role: 'customer',
+      role: 'CUSTOMER',
       memberSince: USER.memberSince,
       isVip: USER.isVip,
       phone: '+1 (555) 123-4567',
@@ -95,7 +106,7 @@ async function main() {
         }),
         paymentMethod: 'credit_card',
         estimatedDelivery: '2025-12-30',
-        status: 'processing',
+        status: 'PROCESSING',
         date: new Date(),
         updatedAt: new Date(),
         items: {
@@ -129,7 +140,7 @@ async function main() {
         }),
         paymentMethod: 'paypal',
         estimatedDelivery: '2025-12-28',
-        status: 'shipped',
+        status: 'SHIPPED',
         date: new Date(Date.now() - 86400000),
         updatedAt: new Date(),
         items: {

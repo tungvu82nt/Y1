@@ -1,11 +1,22 @@
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
 
 model User {
@@ -13,16 +24,18 @@ model User {
   email       String   @unique
   password    String
   name        String?
-  role        String   @default("customer")
+  role        Role     @default(CUSTOMER)
   location    String?
   avatar      String?
   isVip       Boolean  @default(false)
   memberSince String?
   phone       String?
   createdAt   DateTime @default(now())
-  updatedAt   DateTime
-  orders      Order[]
+  updatedAt   DateTime @updatedAt
   cart        Cart?
+  orders      Order[]
+
+  @@index([email])
 }
 
 model Product {
@@ -30,64 +43,83 @@ model Product {
   name          String
   brand         String
   category      String
-  price         Float
-  originalPrice Float?
+  price         Decimal     @db.Decimal(10, 2)
+  originalPrice Decimal?    @db.Decimal(10, 2)
   discount      String?
   image         String
   rating        Float       @default(0)
   reviews       Int         @default(0)
-  tags          String      @default("[]")
+  tags          String[]    @default([])
   createdAt     DateTime    @default(now())
-  updatedAt     DateTime
-  orderItems    OrderItem[]
+  updatedAt     DateTime    @updatedAt
   cartItems     CartItem[]
+  orderItems    OrderItem[]
+  variants      ProductVariant[]
+
+  @@index([category])
+  @@index([brand])
+}
+
+model ProductVariant {
+  id        String  @id @default(uuid())
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  
+  size      String
+  color     String
+  stock     Int     @default(0)
+
+  @@unique([productId, size, color])
 }
 
 model Order {
   id                String      @id @default(uuid())
   userId            String
-  user              User        @relation(fields: [userId], references: [id])
   date              DateTime    @default(now())
-  status            String      @default("Processing")
-  subtotal          Float
-  tax               Float
-  total             Float
+  status            OrderStatus @default(PROCESSING)
+  subtotal          Decimal     @db.Decimal(10, 2)
+  tax               Decimal     @db.Decimal(10, 2)
+  total             Decimal     @db.Decimal(10, 2)
   shippingAddress   String
   paymentMethod     String
   estimatedDelivery String
   createdAt         DateTime    @default(now())
-  updatedAt         DateTime
+  updatedAt         DateTime    @updatedAt
+  user              User        @relation(fields: [userId], references: [id])
   items             OrderItem[]
+
+  @@index([createdAt])
+  @@index([userId])
 }
 
 model OrderItem {
   id            String  @id @default(uuid())
   orderId       String
-  order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId     String
-  product       Product @relation(fields: [productId], references: [id])
   quantity      Int
   selectedSize  String?
   selectedColor String?
-  priceAtTime   Float
+  priceAtTime   Decimal @db.Decimal(10, 2)
+  order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product       Product @relation(fields: [productId], references: [id])
 }
 
 model Cart {
   id        String     @id @default(uuid())
   userId    String     @unique
-  user      User       @relation(fields: [userId], references: [id])
-  items     CartItem[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id])
+  items     CartItem[]
 }
 
 model CartItem {
-  id            String   @id @default(uuid())
+  id            String  @id @default(uuid())
   cartId        String
-  cart          Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   productId     String
-  product       Product  @relation(fields: [productId], references: [id])
   quantity      Int
   selectedSize  String?
   selectedColor String?
+  cart          Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product       Product @relation(fields: [productId], references: [id])
 }

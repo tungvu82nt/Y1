@@ -75,7 +75,7 @@ export const authService = {
         name: data.name,
         email: data.email,
         password: hashedPassword,
-        role: 'user',
+        role: 'CUSTOMER',
         isVip: false,
         updatedAt: new Date(),
       },

@@ -24,7 +24,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, variant = 'st
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart(product, '9', 'Black'); // Defaulting size/color for quick add
+    const defaultVariant = product.variants?.[0] || { size: 'M', color: 'Black' };
+    addToCart(product, defaultVariant.size, defaultVariant.color);
     showToast(`${t('product.added_cart')}`);
   };
 

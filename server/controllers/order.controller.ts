@@ -13,7 +13,10 @@ export const getOrders = async (req: AuthenticatedRequest, res: Response): Promi
   try {
     const userId = req.user?.id;
     const orders = await orderService.getOrders(userId);
-    res.json(orders);
+    res.json({
+      success: true,
+      data: orders,
+    });
   } catch (error: unknown) {
     if (error instanceof ApiError) {
       res.status(error.statusCode).json({

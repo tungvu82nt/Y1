@@ -23,9 +23,14 @@ export const ProductDetails = () => {
   // Find product by ID from Context (allowing for Admin updates to be reflected)
   const product = products.find(p => p.id === id);
 
+  // Extract available variants
+  const variants = product.variants || [];
+  const availableColors = Array.from(new Set(variants.map(v => v.color)));
+  const availableSizes = Array.from(new Set(variants.map(v => v.size)));
+
   // Local State for selections
-  const [selectedSize, setSelectedSize] = useState<string>('8.5');
-  const [selectedColor, setSelectedColor] = useState<string>('Red');
+  const [selectedSize, setSelectedSize] = useState<string>(variants[0]?.size || 'M');
+  const [selectedColor, setSelectedColor] = useState<string>(variants[0]?.color || 'Black');
 
   // If product not found, redirect to 404
   if (!product) {
@@ -33,6 +38,20 @@ export const ProductDetails = () => {
   }
 
   const isLiked = isInWishlist(product.id);
+
+  // Filter sizes available for the selected color
+  const sizesForColor = variants
+    .filter(v => v.color === selectedColor)
+    .map(v => v.size);
+
+  const handleColorSelect = (color: string) => {
+    setSelectedColor(color);
+    // If current size not available in new color, pick first available size
+    const availableForNewColor = variants.filter(v => v.color === color);
+    if (!availableForNewColor.some(v => v.size === selectedSize)) {
+      setSelectedSize(availableForNewColor[0]?.size || '');
+    }
+  };
 
   const handleAddToCart = () => {
     addToCart(product, selectedSize, selectedColor);
@@ -156,14 +175,18 @@ export const ProductDetails = () => {
                         <div className="space-y-3">
                             <span className="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{t('product.select_color')}: <span className="text-slate-900 dark:text-white">{selectedColor}</span></span>
                             <div className="flex gap-3">
-                                {colors.map((c) => (
-                                    <button 
-                                        key={c.name}
-                                        onClick={() => setSelectedColor(c.name)}
-                                        className={`size-10 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm transition-transform hover:scale-110 ${selectedColor === c.name ? `ring-2 ring-offset-2 dark:ring-offset-background-dark ${c.ring}` : ''}`}
-                                        style={{ backgroundColor: c.hex }}
-                                    ></button>
-                                ))}
+                                {availableColors.map((colorName) => {
+                                    const c = getColorData(colorName);
+                                    return (
+                                        <button 
+                                            key={colorName}
+                                            onClick={() => handleColorSelect(colorName)}
+                                            className={`size-10 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm transition-transform hover:scale-110 ${selectedColor === colorName ? `ring-2 ring-offset-2 dark:ring-offset-background-dark ${c.ring}` : ''}`}
+                                            style={{ backgroundColor: c.hex }}
+                                            title={colorName}
+                                        ></button>
+                                    );
+                                })}
                             </div>
                         </div>
 
@@ -177,19 +200,25 @@ export const ProductDetails = () => {
                             </div>
                             <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 p-5 rounded-2xl shadow-sm relative overflow-hidden">
                                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
-                                    {sizes.map(s => (
-                                        <button 
-                                            key={s} 
-                                            onClick={() => setSelectedSize(s)}
-                                            className={`h-12 w-full rounded-xl border font-bold transition-all
-                                                ${selectedSize === s 
-                                                    ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30 scale-105' 
-                                                    : 'border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:border-primary hover:text-primary'
-                                                }`}
-                                        >
-                                            {s}
-                                        </button>
-                                    ))}
+                                    {availableSizes.map(s => {
+                                        const isAvailable = sizesForColor.includes(s);
+                                        return (
+                                            <button 
+                                                key={s} 
+                                                disabled={!isAvailable}
+                                                onClick={() => setSelectedSize(s)}
+                                                className={`h-12 w-full rounded-xl border font-bold transition-all
+                                                    ${selectedSize === s 
+                                                        ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30 scale-105' 
+                                                        : isAvailable 
+                                                            ? 'border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:border-primary hover:text-primary'
+                                                            : 'border-gray-100 dark:border-white/5 text-gray-300 dark:text-gray-600 cursor-not-allowed opacity-50'
+                                                    }`}
+                                            >
+                                                {s}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>

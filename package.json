@@ -19,6 +19,7 @@
   "dependencies": {
     "@apollo/server": "^5.2.0",
     "@prisma/client": "5.10.2",
+    "@tanstack/react-query": "^5.90.16",
     "@types/bcryptjs": "^2.4.6",
     "@types/ioredis": "^4.28.10",
     "@types/jsonwebtoken": "^9.0.10",
@@ -31,6 +32,7 @@
     "graphql": "^16.12.0",
     "ioredis": "^5.8.2",
     "jsonwebtoken": "^9.0.3",
+    "node-fetch": "^3.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
@@ -54,6 +56,7 @@
     "jsdom": "^27.3.0",
     "postcss": "^8.4.35",
     "prisma": "5.10.2",
+    "puppeteer": "^24.34.0",
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
