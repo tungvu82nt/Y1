@@ -2,7 +2,7 @@ import React, { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
-import { ErrorBoundary } from '../components/ErrorBoundary';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 // Test providers wrapper
 interface AllTheProvidersProps {
@@ -97,7 +97,7 @@ export const mockApiResponse = (data: any, success = true) => ({
 // LocalStorage helpers for testing
 export const createMockLocalStorage = () => {
   const store: Record<string, string> = {};
-  
+
   return {
     getItem: vi.fn((key: string) => store[key] || null),
     setItem: vi.fn((key: string, value: string) => {
@@ -116,28 +116,28 @@ export const createMockLocalStorage = () => {
 // WebSocket mock for testing
 export const createMockWebSocket = () => {
   const callbacks: Record<string, Function[]> = {};
-  
+
   return {
     onopen: null as ((event: Event) => void) | null,
     onclose: null as ((event: CloseEvent) => void) | null,
     onerror: null as ((event: Event) => void) | null,
     onmessage: null as ((event: MessageEvent) => void) | null,
     readyState: 1 as const, // WebSocket.OPEN
-    
+
     addEventListener: vi.fn((event: string, callback: Function) => {
       if (!callbacks[event]) callbacks[event] = [];
       callbacks[event].push(callback);
     }),
-    
+
     removeEventListener: vi.fn((event: string, callback: Function) => {
       if (callbacks[event]) {
         callbacks[event] = callbacks[event].filter(cb => cb !== callback);
       }
     }),
-    
+
     send: vi.fn(),
     close: vi.fn(),
-    
+
     // Helper methods for testing
     triggerOpen: vi.fn(() => {
       if (callbacks.open) {
@@ -147,7 +147,7 @@ export const createMockWebSocket = () => {
         mockWebSocket.onopen({ type: 'open' } as Event);
       }
     }),
-    
+
     triggerClose: vi.fn((code = 1000, reason = '') => {
       if (callbacks.close) {
         callbacks.close.forEach(cb => cb({ code, reason, type: 'close' } as CloseEvent));
@@ -156,7 +156,7 @@ export const createMockWebSocket = () => {
         mockWebSocket.onclose({ code, reason, type: 'close' } as CloseEvent);
       }
     }),
-    
+
     triggerError: vi.fn((error = new Error('Test error')) => {
       if (callbacks.error) {
         callbacks.error.forEach(cb => cb(error));
@@ -165,7 +165,7 @@ export const createMockWebSocket = () => {
         mockWebSocket.onerror(error as Event);
       }
     }),
-    
+
     triggerMessage: vi.fn((data: any) => {
       const message = { type: 'message', data: JSON.stringify(data) };
       if (callbacks.message) {

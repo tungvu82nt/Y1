@@ -26,6 +26,13 @@
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
+  "exclude": [
+    "tests",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "dist",
+    "node_modules"
+  ],
   "ts-node": {
     "esm": true,
     "experimentalSpecifierResolution": "node"

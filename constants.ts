@@ -16,7 +16,7 @@ export const USER: User = {
   memberSince: "2021",
   location: "New York, USA",
   isVip: true,
-  role: 'customer'
+  role: 'CUSTOMER'
 };
 
 /**

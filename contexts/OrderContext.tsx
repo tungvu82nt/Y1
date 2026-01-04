@@ -48,9 +48,9 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     const unsubscribeUpdated = subscribe<OrderUpdateMessage>('order_status', (data) => {
       console.log("🔔 Real-time Order Status Update:", data);
-      setOrders(prev => prev.map(o => 
-        o.id === data.id ? { 
-          ...o, 
+      setOrders(prev => prev.map(o =>
+        o.id === data.id ? {
+          ...o,
           status: data.status,
           ...(data.estimatedDelivery && { estimatedDelivery: data.estimatedDelivery })
         } : o
@@ -70,10 +70,10 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const fetchOrders = async (): Promise<void> => {
     if (!user) return;
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await api.get<Order[]>('/orders');
       if (response.success && response.data) {
@@ -97,10 +97,10 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [user?.id]);
 
   const addOrder = async (
-    items: CartItem[], 
-    subtotal: number, 
-    tax: number, 
-    total: number, 
+    items: CartItem[],
+    subtotal: number,
+    tax: number,
+    total: number,
     address: string
   ): Promise<void> => {
     if (!user) {
@@ -112,7 +112,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     try {
       const response = await api.post<Order, any>('/orders', { /* ... payload ... */ });
-      
+
       if (response.success && response.data) {
         const formattedOrder: Order = {
           ...response.data,
@@ -125,7 +125,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           saveOrdersToStorage(updated);
           return updated;
         });
-        
+
         setCurrentOrder(formattedOrder);
       } else {
         throw new Error(response.error || 'Failed to create order');
@@ -133,14 +133,15 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } catch (error) {
       console.error("API not available, using local storage:", error);
       setError(error instanceof Error ? error.message : 'Failed to create order');
-      
+
       const localOrder: Order = {
         id: Date.now().toString(),
         userId: user.id,
-        items,
+        items: items,
         subtotal,
         tax,
         total,
+        shippingCost: 0,
         shippingAddress: address,
         status: 'PROCESSING',
         date: new Date().toLocaleDateString(),
@@ -153,7 +154,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         saveOrdersToStorage(updated);
         return updated;
       });
-      
+
       setCurrentOrder(localOrder);
     } finally {
       setIsLoading(false);
@@ -163,13 +164,13 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const updateOrderStatus = async (id: string, status: Order['status']): Promise<void> => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await api.put<Order, any>(`/orders/${id}/status`, { status });
-      
+
       if (response.success) {
         setOrders(prev => {
-          const updated = prev.map(o => 
+          const updated = prev.map(o =>
             o.id === id ? { ...o, status } : o
           );
           saveOrdersToStorage(updated);
@@ -181,9 +182,9 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } catch (error) {
       console.error("API not available, updating local storage:", error);
       setError(error instanceof Error ? error.message : 'Failed to update order status');
-      
+
       setOrders(prev => {
-        const updated = prev.map(o => 
+        const updated = prev.map(o =>
           o.id === id ? { ...o, status } : o
         );
         saveOrdersToStorage(updated);
@@ -207,13 +208,13 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   return (
-    <OrderContext.Provider value={{ 
-      orders, 
-      currentOrder, 
+    <OrderContext.Provider value={{
+      orders,
+      currentOrder,
       isLoading,
       error,
-      addOrder, 
-      updateOrderStatus, 
+      addOrder,
+      updateOrderStatus,
       getOrderById,
       refreshOrders,
       clearError

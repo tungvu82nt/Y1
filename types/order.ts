@@ -1,4 +1,4 @@
-import { CartItem, CartItemRequest } from ".";
+import { CartItem, CartItemRequest } from "../types";
 
 // Order types
 export interface Order {

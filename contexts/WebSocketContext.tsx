@@ -9,14 +9,15 @@ import { useAuth } from "./AuthContext";
 import { WebSocketMessage } from "../types/websocket";
 
 // Define specific message types for type safety
-export type WebSocketMessageType = 
+export type WebSocketMessageType =
   | 'cart_update'
   | 'order_status'
   | 'product_stock'
   | 'user_notification'
   | 'price_update'
   | 'connected'
-  | 'error';
+  | 'error'
+  | 'order_created';
 
 export type MessageHandler<T = any> = (data: T) => void;
 
@@ -80,7 +81,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     setConnectionStatus('connecting');
-    
+
     try {
       const wsUrl = getWebSocketUrl();
       console.log("Connecting to WebSocket:", wsUrl);
@@ -93,7 +94,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsConnected(true);
         setConnectionStatus('connected');
         reconnectAttemptsRef.current = 0;
-        
+
         if (reconnectTimeoutRef.current) {
           clearTimeout(reconnectTimeoutRef.current);
           reconnectTimeoutRef.current = undefined;
@@ -104,7 +105,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         console.log(`⚠️ WebSocket Disconnected: Code ${event.code}, Reason: ${event.reason}`);
         setIsConnected(false);
         setConnectionStatus('disconnected');
-        
+
         // Only attempt reconnect if it wasn't a normal closure
         if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
           reconnectTimeoutRef.current = setTimeout(() => {
@@ -120,7 +121,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
       socket.onmessage = (event) => {
         try {
           const message: WebSocketMessage<unknown> = JSON.parse(event.data);
-          
+
           if (!message || typeof message !== 'object' || !message.type) {
             console.warn("Received malformed WebSocket message:", event.data);
             return;
@@ -170,14 +171,14 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, [user?.id]);
 
-  const subscribe = <T>(
-    type: WebSocketMessageType, 
+  const subscribe = <T,>(
+    type: WebSocketMessageType,
     handler: MessageHandler<T>
   ): (() => void) => {
     if (!handlersRef.current.has(type)) {
       handlersRef.current.set(type, new Set());
     }
-    
+
     const handlerSet = handlersRef.current.get(type);
     if (handlerSet) {
       handlerSet.add(handler as MessageHandler);
@@ -194,7 +195,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   };
 
-  const send = <T>(type: WebSocketMessageType, data: T): void => {
+  const send = <T,>(type: WebSocketMessageType, data: T): void => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
       const message: WebSocketMessage<T> = {
         type,
@@ -202,7 +203,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         timestamp: new Date().toISOString(),
         id: crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`
       };
-      
+
       socketRef.current.send(JSON.stringify(message));
     } else {
       console.warn("Cannot send message, WebSocket is not open. Status:", connectionStatus);
@@ -211,9 +212,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <WebSocketContext.Provider value={{ 
-      isConnected, 
-      subscribe, 
+    <WebSocketContext.Provider value={{
+      isConnected,
+      subscribe,
       send,
       connectionStatus
     }}>

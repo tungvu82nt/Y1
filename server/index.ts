@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
-import { ApolloServer } from '@apollo/server';
+import { ApolloServer, HeaderMap } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { errorHandler } from './middleware/error.middleware.ts';
 import { rateLimitMiddleware, authRateLimitMiddleware } from './middleware/rateLimit.middleware.ts';
@@ -44,8 +44,8 @@ const apolloServer = new ApolloServer({
   app.use(rateLimitMiddleware);
 
   // GraphQL Endpoint - Manual Express integration for Apollo Server v5
-  app.use('/graphql', cors<cors.CorsRequest>(), express.json(), (req, res) => {
-    const headerMap = new Map<string, string>();
+  app.use('/graphql', cors(), express.json(), (req, res) => {
+    const headerMap = new HeaderMap();
     for (const [key, value] of Object.entries(req.headers)) {
       if (typeof value === 'string') {
         headerMap.set(key, value);
@@ -64,22 +64,15 @@ const apolloServer = new ApolloServer({
       httpGraphQLRequest,
       context: () => context({ req }),
     }).then((httpGraphQLResponse) => {
-      Reflect.ownKeys(httpGraphQLResponse.headers).forEach((key) => {
-        try {
-          if (typeof key === 'string') {
-            const value = (httpGraphQLResponse.headers as Record<string, unknown>)[key];
-            res.setHeader(key, value);
-          }
-        } catch (error) {
-          console.warn(`Failed to set header ${String(key)}:`, error);
-        }
-      });
+      for (const [key, value] of httpGraphQLResponse.headers) {
+        res.setHeader(key, value);
+      }
       res.statusCode = httpGraphQLResponse.status || 200;
-      
+
       if (httpGraphQLResponse.body.kind === 'chunked') {
         const chunks: string[] = [];
         const reader = httpGraphQLResponse.body.asyncIterator[Symbol.asyncIterator]();
-        
+
         const readChunk = async (): Promise<void> => {
           const { done, value } = await reader.next();
           if (done) {
@@ -89,10 +82,10 @@ const apolloServer = new ApolloServer({
           chunks.push(value);
           return readChunk();
         };
-        
+
         return readChunk();
       }
-      
+
       res.end();
     }).catch((error) => {
       console.error('GraphQL execution error:', error);
@@ -115,7 +108,7 @@ const apolloServer = new ApolloServer({
 
   // Health Check
   app.get('/api/health', (req, res) => {
-      res.status(200).json({ status: 'OK' });
+    res.status(200).json({ status: 'OK' });
   });
 
   // Error Handling (Must be last)

@@ -29,13 +29,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
-        const response = await api.post('/auth/login', { email, password });
-        const userData = response.data;
-        setUser(userData);
+      const response = await api.post('/auth/login', { email, password });
+      const userData = response.data;
+      if (userData) {
+        setUser(userData as User);
         localStorage.setItem('yapee_user', JSON.stringify(userData));
+      }
     } catch (error) {
-        console.error("Login failed", error);
-        alert("Login failed. Check server connection.");
+      console.error("Login failed", error);
+      alert("Login failed. Check server connection.");
     }
   };
 
@@ -47,20 +49,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateProfile = async (data: Partial<User>) => {
     if (!user) return;
     try {
-        // Optimistic update
-        const updatedUser = { ...user, ...data };
-        setUser(updatedUser);
-        localStorage.setItem('yapee_user', JSON.stringify(updatedUser));
-        
-        // Sync with backend (assuming id exists on user object from DB)
-        // await api.put('/auth/profile', { id: (user as any).id, ...data });
+      // Optimistic update
+      const updatedUser = { ...user, ...data };
+      setUser(updatedUser);
+      localStorage.setItem('yapee_user', JSON.stringify(updatedUser));
+
+      // Sync with backend (assuming id exists on user object from DB)
+      // await api.put('/auth/profile', { id: (user as any).id, ...data });
     } catch (e) {
-        console.error(e);
+      console.error(e);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isAdmin: user?.role === 'admin', isLoading, login, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isAdmin: user?.role === 'ADMIN', isLoading, login, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

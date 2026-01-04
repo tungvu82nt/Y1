@@ -49,31 +49,35 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const addProduct = async (product: Product) => {
     try {
-        const savedProduct = await api.post('/products', product);
-        setProducts(prev => [savedProduct, ...prev]);
+      const savedProduct = await api.post<Product, Product>('/products', product);
+      if (savedProduct.data) {
+        setProducts(prev => [savedProduct.data!, ...prev]);
+      }
     } catch (e) {
-        console.error("Failed to add product", e);
-        throw e;
+      console.error("Failed to add product", e);
+      throw e;
     }
   };
 
   const updateProduct = async (id: string, updates: Partial<Product>) => {
     try {
-        const updated = await api.put(`/products/${id}`, updates);
-        setProducts(prev => prev.map(p => p.id === id ? updated : p));
+      const updated = await api.put<Product, Partial<Product>>(`/products/${id}`, updates);
+      if (updated.data) {
+        setProducts(prev => prev.map(p => p.id === id ? updated.data! : p));
+      }
     } catch (e) {
-        console.error("Failed to update product", e);
-        alert("Failed to update product");
+      console.error("Failed to update product", e);
+      alert("Failed to update product");
     }
   };
 
   const deleteProduct = async (id: string) => {
     try {
-        await api.delete(`/products/${id}`);
-        setProducts(prev => prev.filter(p => p.id !== id));
+      await api.delete(`/products/${id}`);
+      setProducts(prev => prev.filter(p => p.id !== id));
     } catch (e) {
-        console.error("Failed to delete product", e);
-        alert("Failed to delete product");
+      console.error("Failed to delete product", e);
+      alert("Failed to delete product");
     }
   };
 

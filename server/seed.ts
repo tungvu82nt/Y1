@@ -8,11 +8,12 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting seeding...');
 
-  // Seed Products
+  // Seed Products - Delete in correct order to avoid foreign key constraints
   await prisma.cartItem.deleteMany();
   await prisma.cart.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
+  await prisma.productVariant.deleteMany(); // Delete variants first
   await prisma.product.deleteMany();
   await prisma.user.deleteMany();
 
